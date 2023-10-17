@@ -43,6 +43,7 @@ class StockSpider(scrapy.Spider):
         for url in self.start_urls:
             yield scrapy.Request(url=url, headers=headers, callback=self.parse)
 
+
     def parse(self, response):
         # Xpaths
         quote_container = response.xpath("//div[@class='quote-container']//div[@class='stock-info']")
@@ -123,4 +124,4 @@ def run_spider():
 
 
 # Run this spider
-run_spider()
+#run_spider()
