@@ -36,15 +36,20 @@ class StockSpider(scrapy.Spider):
             'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36',
             'Referer': 'https://xueqiu.com/S/.DJI'
         }
+        print("-----Current Stock Market Indexes-----")
         for url in self.start_urls:
             yield scrapy.Request(url=url, headers=headers, callback=self.parse)
 
     def parse(self, response):
         # Xpaths
         quote_container = response.xpath("//div[@class='quote-container']//div[@class='stock-info']")
+        # Xueqiu regard rising & falling as different
         stock_rise = quote_container.xpath(".//div[@class='stock-price stock-rise']//div[@class='stock-current']")
         stock_fall = quote_container.xpath(".//div[@class='stock-price stock-fall']//div[@class='stock-current']")
+        # stock change
         stock_change = quote_container.xpath(".//div[@class='stock-change']/text()").get()
+        # market status
+        market_status = response.xpath("//div[@class='quote-market-status']/span/text()").get()
 
         # Time
         cur_time = time.time()
@@ -52,10 +57,15 @@ class StockSpider(scrapy.Spider):
 
         # Default extract rise, if none then extract fall
         cur_price = stock_rise.xpath(".//strong/text()").get()
-        cur_price = stock_fall.xpath(".//strong/text()").get() if cur_price is None else cur_price
+        txt_color = '\033[31m'
+        if cur_price is None:
+            cur_price = stock_fall.xpath(".//strong/text()").get()
+            txt_color = '\033[32m'
 
         # Protection
         cur_price = 'Unavailable' if cur_price is None else cur_price
+        market_status = '' if market_status is None else market_status
+        txt_color = '\033[0m' if cur_price is None else txt_color
         stock_change = "Unavailable" if stock_change is None else stock_change
 
         # Resolve Stock Code
@@ -78,13 +88,17 @@ class StockSpider(scrapy.Spider):
                 "Current Time": time_str
             }
         )
-        print(stock_name+'('+stock_code + ')\n' +'Current Price: '+ cur_price + '\n' + "Stock Change: " + stock_change)
+        print(
+            txt_color +
+            stock_name+'('+stock_code + ')' + '(' + market_status + ')\n'
+            'Current Price: ' + cur_price + '\n' +
+            'Stock Change: ' + stock_change
+            )
         print('Current Time: '+time_str)
         print('\n')
 
 
 def run_spider():
-    print("-----Current Stock Market Indexes-----")
     # 创建CrawlerProcess实例
     process = CrawlerProcess()
     # 添加爬虫到CrawlerProcess实例
