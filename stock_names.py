@@ -9,5 +9,5 @@ stock = {
     'BJ899050': '北证50',
     'HKHSI': '恒生指数',
     'HKHSTECH': '恒生科创指数',
-    'HKHSCEI': '国企业指数'
+    'HKHSCEI': '国企指数'
 }

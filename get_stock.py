@@ -1,5 +1,4 @@
 import scrapy
-import random
 import time
 import re
 import logging
@@ -12,16 +11,16 @@ import stock_names
 class StockSpider(scrapy.Spider):
     name = 'xueqiu'
     allowed_domains = ['xueqiu.com']
-    start_urls = ['https://xueqiu.com/S/.DJI',          # 道琼斯指数
-                  'https://xueqiu.com/S/.IXIC',         # 纳斯达克综合指数
-                  'https://xueqiu.com/S/.INX',          # 标普500指数
-                  'https://xueqiu.com/S/SH000688',      # 科创50
-                  'https://xueqiu.com/S/SH000016',      # 上证50
-                  'https://xueqiu.com/S/SH000300',      # 沪深300
-                  'https://xueqiu.com/S/BJ899050',      # 北证50
-                  'https://xueqiu.com/S/HKHSI',         # 恒生指数
-                  'https://xueqiu.com/S/HKHSTECH',      # 恒生科创指数
-                  'https://xueqiu.com/S/HKHSCEI'        # 国企指数
+    start_urls = ['https://xueqiu.com/S/.DJI',      # 道琼斯指数
+                  'https://xueqiu.com/S/.IXIC',     # 纳斯达克综合指数
+                  'https://xueqiu.com/S/.INX',      # 标普500指数
+                  'https://xueqiu.com/S/SH000688',  # 科创50
+                  'https://xueqiu.com/S/SH000016',  # 上证50
+                  'https://xueqiu.com/S/SH000300',  # 沪深300
+                  'https://xueqiu.com/S/BJ899050',  # 北证50
+                  'https://xueqiu.com/S/HKHSI',     # 恒生指数
+                  'https://xueqiu.com/S/HKHSTECH',  # 恒生科创指数
+                  'https://xueqiu.com/S/HKHSCEI'    # 国企指数
                   ]
     custom_settings = {
         # Ignore some warnings and logs
@@ -29,14 +28,18 @@ class StockSpider(scrapy.Spider):
         'REQUEST_FINGERPRINTER_IMPLEMENTATION': '2.7'
     }
 
-    stock_data=[]
+    stock_data = []
+    index = 0
+
     def start_requests(self):
         # TODO: 做一个动态的请求头
         headers = {
             'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36',
             'Referer': 'https://xueqiu.com/S/.DJI'
         }
-        print("-----Current Stock Market Indexes-----")
+        print("\n~~-----Current Stock Market Indexes-----~~\n")
+
+        # Crawl all the urls
         for url in self.start_urls:
             yield scrapy.Request(url=url, headers=headers, callback=self.parse)
 
@@ -79,23 +82,35 @@ class StockSpider(scrapy.Spider):
         # Stock Name
         stock_name = stock_names.stock[stock_code]
 
-        self.stock_data.append(
-            {
-                "Stock Code": stock_code,
-                "Stock Name CN": stock_name,
-                "Current Price": cur_price,
-                "Stock Change": stock_change,
-                "Current Time": time_str
-            }
-        )
-        print(
-            txt_color +
-            stock_name+'('+stock_code + ')' + '(' + market_status + ')\n'
-            'Current Price: ' + cur_price + '\n' +
-            'Stock Change: ' + stock_change
-            )
-        print('Current Time: '+time_str)
-        print('\n')
+        # Deal with data
+        data = {
+            "Index": self.index,
+            "Stock Code": stock_code,
+            "Stock Name CN": stock_name,
+            "Market Status": market_status,
+            "Current Price": cur_price,
+            "Stock Change": stock_change,
+            "Current Time": time_str
+        }
+        self.stock_data.append(data)
+
+        # Print result, deal with index
+        self.index = print_result(data, txt_color)
+
+
+def print_result(data, txt_color):
+    print('\033[0m' + str(data['Index'] + 1) + '. ' + data['Market Status'] + '\n')  # index
+    print(  # Stock information
+        txt_color +
+        data['Stock Name CN'] + '(' + data['Stock Code'] + ')' + '\n' +
+        'Current Price: ' + data['Current Price'] + '\n' +
+        'Stock Change: ' + data['Stock Change']
+    )
+    print('Current Time: ' + data['Current Time'])
+    print('\n')
+
+    # Put here because async
+    return data['Index'] + 1
 
 
 def run_spider():
@@ -105,6 +120,7 @@ def run_spider():
     process.crawl(StockSpider)
     # 启动爬虫
     process.start()
+
 
 # Run this spider
 run_spider()
