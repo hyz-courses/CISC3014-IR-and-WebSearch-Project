@@ -1,2 +1,0 @@
-print("hyz")
-print("czr")
