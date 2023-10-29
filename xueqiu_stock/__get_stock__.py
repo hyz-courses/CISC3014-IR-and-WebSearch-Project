@@ -4,17 +4,19 @@ import re
 import logging
 import pandas as pd
 from scrapy.crawler import CrawlerProcess
+import os
 
 # local imports
 import __stock_terms__
 import __quote_info__
 import __settings__
+import __save_data__
 
 
 class StockSpider(scrapy.Spider):
     name = 'xueqiu'
     allowed_domains = ['xueqiu.com']
-    is_terminal_beautiful = True
+    is_terminal_beautiful = False
     start_urls = __settings__.urls
     custom_settings = {
         # Terminal settings: Ignore some warnings and logs
@@ -22,8 +24,8 @@ class StockSpider(scrapy.Spider):
         'REQUEST_FINGERPRINTER_IMPLEMENTATION': '2.7',
 
         # Local settings
-        'LANG': 'EN',
-        'USE_EXACT_VALUES': True,
+        'LANG': 'CN',
+        'USE_EXACT_VALUES': False,
         'SAVE_DATA': True,
     }
 
@@ -43,18 +45,17 @@ class StockSpider(scrapy.Spider):
         for url in self.start_urls:
             yield scrapy.Request(url=url, headers=headers, callback=self.parse)
 
-
     def parse(self, response):
         # --------- Get required data ---------
         quote_container = response.xpath("//div[@class='quote-container']")
         stock_info = quote_container.xpath(".//div[@class='stock-info']")
-        quote_info = quote_container.xpath(".//table[@class='quote-info']//td")        # Quote Info
+        quote_info = quote_container.xpath(".//table[@class='quote-info']//td")  # Quote Info
         # Stock Price
         stock_rise = stock_info.xpath(".//div[@class='stock-price stock-rise']//div[@class='stock-current']")
         stock_fall = stock_info.xpath(".//div[@class='stock-price stock-fall']//div[@class='stock-current']")
         # Stock attributes
-        stock_change = stock_info.xpath(".//div[@class='stock-change']/text()").get()                    # stock change
-        market_status = response.xpath("//div[@class='quote-market-status']/span/text()").get()          # Market status
+        stock_change = stock_info.xpath(".//div[@class='stock-change']/text()").get()  # stock change
+        market_status = response.xpath("//div[@class='quote-market-status']/span/text()").get()  # Market status
 
         # --------------- Time ----------------
         cur_time = time.time()
@@ -80,7 +81,7 @@ class StockSpider(scrapy.Spider):
 
         # -------- Resolve Stock Code --------
         pattern = r'\/\.?([A-Z0-9]+)$'
-        match = re.search(pattern, response.url)    # Extract stock code from url tail
+        match = re.search(pattern, response.url)  # Extract stock code from url tail
         if match:
             stock_code = match.group(1)
         else:
@@ -89,7 +90,7 @@ class StockSpider(scrapy.Spider):
         # ------------ Stock Name ------------
         stock_name = "No name"
         if self.custom_settings["LANG"] == "CN" and stock_code in __stock_terms__.stock_CN:
-            stock_name = __stock_terms__.stock_EN[stock_code]
+            stock_name = __stock_terms__.stock_CN[stock_code]
         elif self.custom_settings["LANG"] == "EN" and stock_code in __stock_terms__.stock_EN:
             stock_name = __stock_terms__.stock_EN[stock_code]
 
@@ -97,41 +98,33 @@ class StockSpider(scrapy.Spider):
         # Quote data
         quote_info_data = __quote_info__.resolve_quote_info_data(
             quote_info,
-            self.custom_settings["LANG"],               # Language of attributes
-            self.custom_settings["USE_EXACT_VALUES"]    # Use linguistic units or not
+            self.custom_settings["LANG"],  # Language of attributes
+            self.custom_settings["USE_EXACT_VALUES"]  # Use linguistic units or not
         )
         # Fundamental Data
         data = {
             "Index": self.index,
+            "Current Time": time_str,
             "Stock Code": stock_code,
             "Stock Name CN": stock_name,
             "Market Status": market_status,
             "Current Price": cur_price,
             "Stock Change": stock_change,
-            "Quote Info": quote_info_data,      # Quote info is compressed here
-            "Current Time": time_str
+            "Quote Info": quote_info_data,  # Quote info is compressed here
         }
 
         self.stock_data.append(data)
 
         # Print result, deal with index
-        self.index = print_result(data, txt_color)
+        self.index = print_result_int_console(data, txt_color)
 
-        #save_data_to_excel(data,stock_name)
-        print(data)
-
-
-def save_data_to_excel(data, stock_name="Undefined"):
-    file_name = stock_name+".xlsx"
-    df = pd.DataFrame(data)
-    df['Quote Info'] = df['Quote Info'].apply(pd.Series)  # 展开Quote Info列为多个列
-    df.drop('Quote Info', axis=1, inplace=True)  # 删除"Quote Info"列
-    df.to_excel(file_name, index=False)
+        # Save data to excel
+        if self.custom_settings['SAVE_DATA']:
+            __save_data__.save_data_to_excel(data, stock_code)
 
 
-
-# Print the results in the terminal
-def print_result(data, txt_color):
+# Print the results in the console. It is very beautiful!!
+def print_result_int_console(data, txt_color):
     # Index and market status
     print('\033[0m' + str(data['Index'] + 1) + '. ' + data['Market Status'] + '\n')  # index
 
@@ -144,20 +137,17 @@ def print_result(data, txt_color):
     )
 
     # Stock quote info
+    print_quote = lambda quote_info_data: [print(key + ": " + str(value)) for key, value in quote_info_data.items()]
+    print("-------Quotes-------")
     print_quote(data['Quote Info'])
+    print('--------------------')
+
+    # Date and Time
     print('Current Time: ' + data['Current Time'])
     print('\n')
 
     # Put here because async
     return data['Index'] + 1
-
-
-# Print quote info specifically
-def print_quote(quote_info_data):
-    print("-------Quotes-------")
-    for key, value in quote_info_data.items():
-        print(key + ": " + str(value))
-    print('--------------------')
 
 
 def run_spider():
