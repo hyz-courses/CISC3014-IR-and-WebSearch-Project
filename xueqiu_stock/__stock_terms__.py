@@ -9,7 +9,8 @@ stock_CN = {
     'BJ899050': '北证50',
     'HKHSI': '恒生指数',
     'HKHSTECH': '恒生科创指数',
-    'HKHSCEI': '国企指数'
+    'HKHSCEI': '国企指数',
+    'SZ399001': '深圳成指'
 }
 
 stock_EN = {
@@ -23,7 +24,8 @@ stock_EN = {
     'BJ899050': '北证50',
     'HKHSI': 'Hang Seng Indexes',
     'HKHSTECH': '恒生科创指数',
-    'HKHSCEI': '国企指数'
+    'HKHSCEI': '国企指数',
+    'SZ399001': '深圳成指'
 }
 
 terms = {
