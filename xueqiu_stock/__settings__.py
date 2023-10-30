@@ -10,4 +10,5 @@ urls = [
       'https://xueqiu.com/S/HKHSTECH',          # 恒生科创指数
       'https://xueqiu.com/S/HKHSCEI',           # 国企指数
       'https://xueqiu.com/S/SZ399001',          # 深圳成指数
+      'https://xueqiu.com/S/SZ399006',          # 创业板指
 ]

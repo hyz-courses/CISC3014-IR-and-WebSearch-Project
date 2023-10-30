@@ -1,3 +1,5 @@
+# Please set the SAVE_DATA to True in order to record data.
+
 import scrapy
 import time
 import re
@@ -24,9 +26,10 @@ class StockSpider(scrapy.Spider):
         'REQUEST_FINGERPRINTER_IMPLEMENTATION': '2.7',
 
         # Local settings
-        'LANG': 'CN',
-        'USE_EXACT_VALUES': False,
+        'LANG': 'EN',
+        'USE_EXACT_VALUES': True,
         'SAVE_DATA': True,
+        'ROUND_LEVEL': 3,
     }
 
     stock_data = []
@@ -98,8 +101,9 @@ class StockSpider(scrapy.Spider):
         # Quote data
         quote_info_data = __quote_info__.resolve_quote_info_data(
             quote_info,
-            self.custom_settings["LANG"],  # Language of attributes
-            self.custom_settings["USE_EXACT_VALUES"]  # Use linguistic units or not
+            self.custom_settings["LANG"],               # Language of attributes
+            self.custom_settings["USE_EXACT_VALUES"],   # Use linguistic units or not
+            self.custom_settings["ROUND_LEVEL"]         # Round level
         )
         # Fundamental Data
         data = {

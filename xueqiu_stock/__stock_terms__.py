@@ -10,7 +10,8 @@ stock_CN = {
     'HKHSI': '恒生指数',
     'HKHSTECH': '恒生科创指数',
     'HKHSCEI': '国企指数',
-    'SZ399001': '深圳成指'
+    'SZ399001': '深圳成指',
+    'SZ399006': '创业板指',
 }
 
 stock_EN = {
@@ -23,14 +24,23 @@ stock_EN = {
     'SH000300': '沪深300',
     'BJ899050': '北证50',
     'HKHSI': 'Hang Seng Indexes',
-    'HKHSTECH': '恒生科创指数',
+    'HKHSTECH': 'Hang Seng Technology Indexes',
     'HKHSCEI': '国企指数',
-    'SZ399001': '深圳成指'
+    'SZ399001': '深圳成指',
+    'SZ399006': '创业板指',
 }
 
 terms = {
-    '休市': 'Market Closed',
-    '交易中': 'Market Opens',
+    # Stock market status
+    '开市前': 'Pre-Market',
+    '盘前交易': 'Pre-market Trading',
+    '开盘': 'Market Open',
+    '休市': 'Stock Market Closed',
+    '盘后交易': 'After-hours Trading',
+    '交易中': 'Trading in Progress',
+    '已收盘': 'Market Closed',
+
+    # Stock quote information
     '最高': 'Highest',
     '今开': 'Opening Price',
     '成交量': 'Trading Volume',
