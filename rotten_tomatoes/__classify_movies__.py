@@ -55,16 +55,19 @@ def binary_analysis(condition, target, cond_name="Binary Analysis"):
     # Compute entropy
     # Parent entropy
     num_total = num_targ_neg + num_targ_pos       # Total num of records
-    neg_ratio = num_targ_neg / num_total if num_total != 0 else 0      # Target negative
-    pos_ratio = num_targ_pos / num_total if num_total != 0 else 0      # Target positive
     e_parent = get_entropy(num_targ_neg, num_targ_pos)
 
     # Child entropy
+    num_cond_neg = len(id_cond_neg)
+    num_cond_pos = len(id_cond_pos)
+    cond_neg_ratio = num_cond_neg / num_total if num_total != 0 else 0      # Target negative
+    cond_pos_ratio = num_cond_pos / num_total if num_total != 0 else 0      # Target positive
+
     e_neg = get_entropy(neg_neg, neg_pos)       # Condition negative
     e_pos = get_entropy(pos_neg, pos_pos)       # Condition positive
 
     # Information gain
-    info_gain = e_parent - (neg_ratio * e_neg + pos_ratio * e_pos)        # Total information gain
+    info_gain = e_parent - (cond_neg_ratio * e_neg + cond_pos_ratio * e_pos)        # Total information gain
 
     # Print in console
     print(
@@ -73,10 +76,12 @@ def binary_analysis(condition, target, cond_name="Binary Analysis"):
         "|---------- Records ----------|"
     )
     print(
-        "Total num of condition '0's: " + str(num_targ_neg) + '\n' +
-        "Total num of condition '1's: " + str(num_targ_pos) + '\n' +
-        "Negative ratio: " + str(neg_ratio) + '\n' +
-        "Positive ratio: " + str(pos_ratio) + '\n' +
+        "Num of condition 0: " + str(num_cond_neg) + '\n' +
+        "Num of condition 1: " + str(num_cond_pos) + '\n' +
+        "Num of target 0: " + str(num_targ_neg) + '\n' +
+        "Num of target 1: " + str(num_targ_pos) + '\n' +
+        "Negative ratio: " + str(cond_neg_ratio) + '\n' +
+        "Positive ratio: " + str(cond_pos_ratio) + '\n' +
         "Total num: " + str(num_total)
     )
     print("|---------- Entropy ----------|")
@@ -188,9 +193,11 @@ def numeric_analysis(condition, target, cond_name="Numeric Analysis"):
         '\n\n' +
         ">>>>>>>>>> " + cond_name + " <<<<<<<<<<" + '\n' +
         "|---------- Records ----------|" + '\n' +
-        "Total num of small: " + str(num_small) + '\n' +
-        "Total num of medium: " + str(num_medium) + '\n' +
-        "Total num of large:" + str(num_large) + '\n' +
+        "Num of condition small: " + str(num_small) + '\n' +
+        "Num of condition medium: " + str(num_medium) + '\n' +
+        "Num of condition large: " + str(num_large) + '\n' +
+        "Num of target 0:" + str(num_targ_neg) + '\n' +
+        "Num of target 1:" + str(num_targ_pos) + '\n' +
         "Total record num: " + str(num_total) + '\n' +
         "|---------- Entropy ----------|" + '\n' +
         "Parent Entropy: " + str(e_parent) + '\n' +
