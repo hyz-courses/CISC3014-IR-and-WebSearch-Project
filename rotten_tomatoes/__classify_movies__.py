@@ -18,51 +18,53 @@ def binary_analysis(condition, target, cond_name="Binary Analysis"):
         entropy = (-1) * (a_log_a - b_log_b)
         return entropy
 
-    negative = []       # negative conditions
-    positive = []       # positive conditions
+    id_cond_neg = []       # negative conditions
+    id_cond_pos = []       # positive conditions
+    num_targ_neg = 0       # num of negative targets
+    num_targ_pos = 0       # num of positive targets
 
     # go through every row in the condition
     for index, row in enumerate(condition):
         if row == 0:
-            negative.append(index)
+            id_cond_neg.append(index)
         if row == 1:
-            positive.append(index)
+            id_cond_pos.append(index)
 
     # Focus on condition negative
     neg_neg = 0     # target negative
     neg_pos = 0     # target positive
-    for index in negative:
+    for index in id_cond_neg:
         if target[index] == 0:
             neg_neg += 1
+            num_targ_neg += 1
         if target[index] == 1:
             neg_pos += 1
+            num_targ_pos += 1
 
-    # Focus on condition positive
+            # Focus on condition positive
     pos_neg = 0     # target negative
     pos_pos = 0     # target positive
-    for index in positive:
+    for index in id_cond_pos:
         if target[index] == 0:
             neg_neg += 1
+            num_targ_neg += 1
         if target[index] == 1:
             neg_pos += 1
+            num_targ_pos += 1
 
     # Compute entropy
     # Parent entropy
-    num_neg_total = len(negative)               # Total num of negative
-    num_pos_total = len(positive)               # Total num of positive
-    num_total = num_neg_total + num_pos_total   # Total num of records
-
-    neg_ratio = num_neg_total / num_total if num_total != 0 else 0      # Negative ratio
-    pos_ratio = num_pos_total / num_total if num_total != 0 else 0      # Positive ratio
-
-    e_before_class = get_entropy(num_neg_total, num_pos_total)      # Entropy before classification
+    num_total = num_targ_neg + num_targ_pos       # Total num of records
+    neg_ratio = num_targ_neg / num_total if num_total != 0 else 0      # Target negative
+    pos_ratio = num_targ_pos / num_total if num_total != 0 else 0      # Target positive
+    e_parent = get_entropy(num_targ_neg, num_targ_pos)
 
     # Child entropy
-    e_neg = get_entropy(neg_neg, neg_pos)       # Entropy of classification of negative
-    e_pos = get_entropy(pos_neg, pos_pos)       # Entropy of classification of positive
+    e_neg = get_entropy(neg_neg, neg_pos)       # Condition negative
+    e_pos = get_entropy(pos_neg, pos_pos)       # Condition positive
 
     # Information gain
-    info_gain = e_before_class - (neg_ratio * e_neg + pos_ratio * e_pos)        # Total information gain
+    info_gain = e_parent - (neg_ratio * e_neg + pos_ratio * e_pos)        # Total information gain
 
     # Print in console
     print(
@@ -71,8 +73,8 @@ def binary_analysis(condition, target, cond_name="Binary Analysis"):
         "|---------- Records ----------|"
     )
     print(
-        "Total num of condition '0's: " + str(num_neg_total) + '\n' +
-        "Total num of condition '1's: " + str(num_pos_total) + '\n' +
+        "Total num of condition '0's: " + str(num_targ_neg) + '\n' +
+        "Total num of condition '1's: " + str(num_targ_pos) + '\n' +
         "Negative ratio: " + str(neg_ratio) + '\n' +
         "Positive ratio: " + str(pos_ratio) + '\n' +
         "Total num: " + str(num_total)
@@ -81,7 +83,7 @@ def binary_analysis(condition, target, cond_name="Binary Analysis"):
     wow_eneg = " (wow!)" if e_neg == 0 else ""
     wow_epos = " (wow!)" if e_pos == 0 else ""
     print(
-        "Entropy of parent: " + str(e_before_class) + '\n' +
+        "Entropy of parent: " + str(e_parent) + '\n' +
         "Entropy of class '0': " + str(e_neg) + wow_eneg + '\n' +
         "Entropy of class '1': " + str(e_pos) + wow_epos
     )
@@ -122,37 +124,49 @@ def numeric_analysis(condition, target, cond_name="Numeric Analysis"):
         entropy = (-1) * (a_log_a - b_log_b)
         return entropy
 
-
     # Defines left mean and right mean
     mean_val = condition.mean()
     left_mean = (condition.min() + mean_val) / 2
     right_mean = (condition.max() + mean_val) / 2
 
-    small = []
-    medium = []
-    large = []
+    id_cond_small = []          # condition small
+    id_cond_medium = []         # condition medium
+    id_cond_large = []          # condition large
+
 
     # Categorize into 3 conditions: small, medium, and large
     for index, row in enumerate(condition):
         if row < left_mean:
-            small.append(index)
+            id_cond_small.append(index)
         elif row > right_mean:
-            large.append(index)
+            id_cond_large.append(index)
         else:
-            medium.append(index)
+            id_cond_medium.append(index)
 
     #
-    [s_neg, s_pos] = count(small)
-    [m_neg, m_pos] = count(medium)
-    [l_neg, l_pos] = count(large)
-
+    [s_neg, s_pos] = count(id_cond_small)
+    [m_neg, m_pos] = count(id_cond_medium)
+    [l_neg, l_pos] = count(id_cond_large)
 
     # Compute Entropy
+    # Compute number of target neg & pos
+    num_targ_neg = 0
+    num_targ_pos = 0
+    for target_value in target:
+        if target_value == 0:
+            num_targ_neg += 1
+        else:
+            num_targ_pos += 1
+
     # Parent entropy
-    num_small = len(small)
-    num_medium = len(medium)
-    num_large = len(large)
-    num_total = num_small + num_medium + num_large
+    num_total = num_targ_neg + num_targ_pos
+    e_parent = get_entropy(num_targ_neg, num_targ_pos)
+
+    # Child entropy
+    num_small = len(id_cond_small)
+    num_medium = len(id_cond_medium)
+    num_large = len(id_cond_large)
+
     ratio_small = num_small / num_total if num_total != 0 else 0
     ratio_medium = num_medium / num_total if num_total != 0 else 0
     ratio_large = num_large / num_total if num_total != 0 else 0
@@ -160,8 +174,6 @@ def numeric_analysis(condition, target, cond_name="Numeric Analysis"):
     s_log_s = ratio_small * math.log10(ratio_small) if ratio_small !=0 else 0
     m_log_m = ratio_medium * math.log10(ratio_medium) if ratio_medium != 0 else 0
     l_log_l = ratio_large * math.log10(ratio_large) if ratio_large != 0 else 0
-
-    e_parent = (-1) * (s_log_s + m_log_m + l_log_l)
 
     # Child entropy
     e_small = get_entropy(s_neg, s_pos)

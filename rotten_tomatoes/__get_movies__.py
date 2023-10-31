@@ -102,11 +102,8 @@ class RTMovieCrawler(scrapy.Spider):
 
 
 def run_process():
-    # 创建CrawlerProcess实例
     process = CrawlerProcess()
-    # 添加爬虫到CrawlerProcess实例
     process.crawl(RTMovieCrawler)
-    # 启动爬虫
     process.start()
 
 run_process()
