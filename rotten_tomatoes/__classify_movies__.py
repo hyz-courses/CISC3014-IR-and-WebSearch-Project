@@ -1,16 +1,9 @@
 import math
 import pandas as pd
 
-filepath = './movie_list/movie_data.xlsx'
-movie_data = pd.read_excel(filepath)
-aud_score = movie_data['audience score']
-critics_score = movie_data['critics score']
-aud_sentiment = movie_data['audience sentiment']
-critics_sentiment = movie_data['critics sentiment']
-
 
 # Input binary condition and binary target, output information gain
-def binary_analysis(condition, target, name="Binary Analysis"):
+def binary_analysis(condition, target, cond_name="Binary Analysis"):
     def get_entropy(a, b):
         total = a + b
         # Deal with divide by 0 problem
@@ -74,7 +67,7 @@ def binary_analysis(condition, target, name="Binary Analysis"):
     # Print in console
     print(
         '\n\n' +
-        ">>>>>>>>>> " + name + " <<<<<<<<<<" + '\n' +
+        ">>>>>>>>>> " + cond_name + " <<<<<<<<<<" + '\n' +
         "|---------- Records ----------|"
     )
     print(
@@ -98,8 +91,9 @@ def binary_analysis(condition, target, name="Binary Analysis"):
 
     return info_gain
 
+
 # Input numeric condition and binary target, output information gain
-def numeric_analysis(condition, target, name="Numeric Analysis"):
+def numeric_analysis(condition, target, cond_name="Numeric Analysis"):
 
     # Count positive and negative smaples within a conditional class
     def count(cond_class):
@@ -177,21 +171,17 @@ def numeric_analysis(condition, target, name="Numeric Analysis"):
     # Info gain
     info_gain = e_parent - (ratio_small * s_log_s + ratio_medium * m_log_m + ratio_large * l_log_l)
 
-
-
-
-
     # Print result
     print(
         '\n\n' +
-        ">>>>>>>>>> " + name + " <<<<<<<<<<" + '\n' +
+        ">>>>>>>>>> " + cond_name + " <<<<<<<<<<" + '\n' +
         "|---------- Records ----------|" + '\n' +
         "Total num of small: " + str(num_small) + '\n' +
         "Total num of medium: " + str(num_medium) + '\n' +
         "Total num of large:" + str(num_large) + '\n' +
         "Total record num: " + str(num_total) + '\n' +
-        "Parent Entropy: " + str(e_parent) + '\n' +
         "|---------- Entropy ----------|" + '\n' +
+        "Parent Entropy: " + str(e_parent) + '\n' +
         "Entropy of small: " + str(e_small) + '\n' +
         "Entropy of medium: " + str(e_medium) + '\n' +
         "Entropy of large: " + str(e_large) + '\n' +
@@ -199,11 +189,50 @@ def numeric_analysis(condition, target, name="Numeric Analysis"):
         "Information Gain: " + str(info_gain) + '\n'
     )
 
+    return info_gain
+
+
+# Hybrid analysis, combining numeric and binary analysis.
+def hybrid_analysis(condition, target, is_binary=True, name="Analysis Name"):
+    if is_binary:
+        info_gain = binary_analysis(condition, target, name)
+    else:
+        info_gain = numeric_analysis(condition, target, name)
+    return info_gain
+
+# ------------------------- Classification Part ---------------------------
+
+# Read Excel file and do analysis
+filepath = './movie_list/movie_data.xlsx'
+movie_data = pd.read_excel(filepath)
+# Conditions
+aud_score = movie_data['audience score']
+critics_score = movie_data['critics score']
+aud_sentiment = movie_data['audience sentiment']
+# Target
+critics_sentiment = movie_data['critics sentiment']
+
+
+# Get info gain from the three conditions
+ig_aud_sentiment = hybrid_analysis(aud_sentiment, critics_sentiment, True, "Audience Sentiment")    # Audience sentiment
+ig_aud_score = hybrid_analysis(aud_score, critics_sentiment, False, "Audience Score")               # Audience score
+ig_critics_score = hybrid_analysis(critics_score, critics_sentiment, False, "Critics Score")        # Critics score
+
+# Sort the three conditions from high to low
+variables = [
+    ('Audience Sentiment', ig_aud_sentiment),
+    ('Audience Score', ig_aud_score),
+    ('Critics Score', ig_critics_score)
+]
+
+variables_sorted = sorted(variables, key=lambda x: x[1], reverse=True)
+
+# Print the three values:
+print("~~~~~~~~~~~ Info Gain Ranking ~~~~~~~~~~~")
+for i, (name, value) in  enumerate(variables_sorted):
+    print(f"{i+1}. Info Gain from {name}: {value}")
 
 
 
 
-#print(aud_sentiment)
-binary_analysis(aud_sentiment, critics_sentiment, "Audience Sentiment")
-numeric_analysis(aud_score, critics_sentiment, "Audience Score")
-numeric_analysis(critics_score, critics_sentiment, "Critics Score")
+
