@@ -6,15 +6,15 @@ import pandas as pd
 def get_entropy(a, b):
     total = a + b
     # Deal with divide by 0 problem
-    a_ratio = a / total if total != 0 else 0
-    b_ratio = b / total if total != 0 else 0
+    a_ratio = a / total
+    b_ratio = b / total
 
     # Deal with divide by 0 problem
     a_log_a = a_ratio * math.log10(a_ratio) if a_ratio != 0 else 0
     b_log_b = b_ratio * math.log10(b_ratio) if b_ratio != 0 else 0
 
     # Finally, calculate the entropy.....
-    entropy = (-1) * (a_log_a - b_log_b)
+    entropy = (-1) * (a_log_a + b_log_b)
     return entropy
 
 
