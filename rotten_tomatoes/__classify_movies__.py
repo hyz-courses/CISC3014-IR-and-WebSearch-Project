@@ -133,11 +133,17 @@ def binary_analysis(condition, target, cond_name="Binary Analysis"):
 
 
 # Input numeric condition and binary target, output information gain
-def numeric_analysis(condition, target, cond_name="Numeric Analysis"):
+def numeric_analysis(condition, target, cond_name="Numeric Analysis", method="normal_dist", degree=0.4):
     # Defines left mean and right mean
     mean_val = condition.mean()
-    left_mean = (condition.min() + mean_val) / 2
-    right_mean = (condition.max() + mean_val) / 2
+
+    if method == "normal_dist":
+        # Normal distribution
+        left_thresh = mean_val - degree * condition.std()
+        right_thresh = mean_val + degree * condition.std()
+    else:
+        left_thresh = (condition.min() + mean_val) / 2
+        right_thresh = (condition.max() + mean_val) / 2
 
     # Categorize into 3 conditions: small, medium, and large
     id_cond_small = []          # condition small
@@ -145,9 +151,9 @@ def numeric_analysis(condition, target, cond_name="Numeric Analysis"):
     id_cond_large = []          # condition large
 
     for index, row in enumerate(condition):
-        if row < left_mean:
+        if row < left_thresh:
             id_cond_small.append(index)
-        elif row > right_mean:
+        elif row > right_thresh:
             id_cond_large.append(index)
         else:
             id_cond_medium.append(index)
@@ -224,11 +230,11 @@ def numeric_analysis(condition, target, cond_name="Numeric Analysis"):
 
 
 # Hybrid analysis, combining numeric and binary analysis.
-def hybrid_analysis(condition, target, is_binary=True, name="Analysis Name"):
+def hybrid_analysis(condition, target, is_binary=True, cond_name="Analysis Name", method="normal_dist", degree=0.4):
     if is_binary:
-        info_gain = binary_analysis(condition, target, name)
+        info_gain = binary_analysis(condition, target, cond_name)
     else:
-        info_gain = numeric_analysis(condition, target, name)
+        info_gain = numeric_analysis(condition, target, cond_name, method, degree)
     return info_gain
 
 # ------------------------- Evaluation Part ---------------------------
@@ -245,9 +251,28 @@ critics_sentiment = movie_data['critics sentiment']
 
 
 # Get info gain from the three conditions
-ig_aud_sentiment = hybrid_analysis(aud_sentiment, critics_sentiment, True, "Audience Sentiment")    # Audience sentiment
-ig_aud_score = hybrid_analysis(aud_score, critics_sentiment, False, "Audience Score")               # Audience score
-ig_critics_score = hybrid_analysis(critics_score, critics_sentiment, False, "Critics Score")        # Critics score
+ig_aud_sentiment = hybrid_analysis(
+    aud_sentiment,
+    critics_sentiment,
+    True,
+    "Audience Sentiment"
+)    # Audience sentiment
+
+ig_aud_score = hybrid_analysis(
+    aud_score,
+    critics_sentiment,
+    False,
+    "Audience Score",
+    degree=0.4
+)   # Audience score
+
+ig_critics_score = hybrid_analysis(
+    critics_score,
+    critics_sentiment,
+    False,
+    "Critics Score",
+    degree=0.5
+)   # Critics score
 
 # Sort the three conditions from high to low
 variables = [
