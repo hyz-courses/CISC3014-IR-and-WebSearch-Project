@@ -159,9 +159,13 @@ def numeric_analysis(condition, target, cond_name="Numeric Analysis", method="no
             id_cond_medium.append(index)
 
     # Negative and positive part of each conditions
+    # Single node
     [s_neg, s_pos] = count_within_condition(id_cond_small, target)
     [m_neg, m_pos] = count_within_condition(id_cond_medium, target)
     [l_neg, l_pos] = count_within_condition(id_cond_large, target)
+    # Combined node
+    [sm_neg, sm_pos] = [s_neg + m_neg, s_pos + m_pos]
+    [ml_neg, ml_pos] = [m_neg + l_neg, m_pos + l_pos]
 
     # Compute Entropy
     # Compute number of target neg & pos
@@ -179,26 +183,49 @@ def numeric_analysis(condition, target, cond_name="Numeric Analysis", method="no
 
     # Child entropy
     # Number of instances in each condition
+    # Single Nodes
     num_cond_small = len(id_cond_small)
     num_cond_medium = len(id_cond_medium)
     num_cond_large = len(id_cond_large)
+    # Combined Nodes
+    num_cond_small_medium = num_cond_small + num_cond_medium
+    num_cond_medium_large = num_cond_medium + num_cond_large
 
     # Weights of each condition
+    # Single Nodes
     cond_small_ratio = num_cond_small / num_total if num_total != 0 else 0
     cond_medium_ratio = num_cond_medium / num_total if num_total != 0 else 0
     cond_large_ratio = num_cond_large / num_total if num_total != 0 else 0
+    # Combined Nodes
+    cond_small_medium_ratio = num_cond_small_medium / num_total if num_total != 0 else 0
+    cond_medium_large_ratio = num_cond_medium_large / num_total if num_total != 0 else 0
 
     # Entropy of each condition
     e_small = get_entropy(s_neg, s_pos)
     e_medium = get_entropy(m_neg, m_pos)
     e_large = get_entropy(l_neg, l_pos)
+    e_small_medium = get_entropy(sm_neg, sm_pos)
+    e_medium_large = get_entropy(ml_neg, ml_pos)
 
     # Information gain
-    info_gain = e_parent - (
+    wrong_info_gain = e_parent - (
             cond_small_ratio * e_small +
             cond_medium_ratio * e_medium +
             cond_large_ratio * e_large
     )
+
+    info_gain_use_small = e_parent - (
+            cond_small_ratio * e_small +
+            cond_medium_large_ratio * e_medium_large
+    )
+
+    info_gain_use_large = e_parent - (
+            cond_small_medium_ratio * e_small_medium +
+            cond_large_ratio * e_large
+    )
+
+    info_gain = max(info_gain_use_small, info_gain_use_large)
+    partition = "small" if info_gain_use_small > info_gain_use_large else "large"
 
     # Print result
     data = {
@@ -218,10 +245,13 @@ def numeric_analysis(condition, target, cond_name="Numeric Analysis", method="no
             "Parent entropy": e_parent,
             "Entropy small": e_small,
             "Entropy medium": e_medium,
-            "Entropy large": e_large
+            "Entropy large": e_large,
+            "Entropy small & medium": e_small_medium,
+            "Entropy medium & large": e_medium_large,
         },
         "Information Gain": {
             "Info gain": info_gain,
+            "Uses partition": partition,
         }
     }
     console_log(data)
