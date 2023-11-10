@@ -27,7 +27,7 @@ class MovieDetailCrawler(scrapy.Spider):
         # Local settings
         'LANG': 'EN',
         'USE_EXACT_VALUES': True,
-        'SAVE_DATA': False,
+        'SAVE_DATA': True,
         'ROUND_LEVEL': 3,
     }
 
@@ -54,17 +54,22 @@ class MovieDetailCrawler(scrapy.Spider):
         genre = response.xpath("//span[@class='genre']/text()").get()
         genre = re.sub(r'\n|\s|\t', '', genre)
 
+        content = response.xpath("//p[@slot='content']/text()").get()
+        content = re.sub(r'\n|\t', '', content)
+
         data = {
             "title": title,
             "genre": genre,
+            "content": content,
         }
 
         # Save data
         if self.custom_settings['SAVE_DATA']:
-            __save_data__.save_data_to_excel(data, file_name="movie_genre")
+            __save_data__.save_data_to_excel(data, file_name="movie_content")
 
         print("\n title:" + title)
         print("\n genre:" + genre)
+        print("\n content:\n" + content)
 
 
 def run_spider():

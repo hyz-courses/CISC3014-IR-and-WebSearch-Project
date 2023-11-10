@@ -10,7 +10,6 @@ from scrapy import signals
 
 # local imports
 import __save_data__
-import __urls__
 import __get_movie_articles__
 
 class RTMovieCrawler(scrapy.Spider):
