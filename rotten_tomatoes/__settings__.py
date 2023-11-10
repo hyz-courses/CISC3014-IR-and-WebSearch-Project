@@ -7,6 +7,7 @@ custom_settings = {
     'RM_COMMON_WORDS': False,
 }
 
+
 def get_movie_url():
     # Read Excel file and do analysis
     file_path = './movie_list/movie_data.xlsx'

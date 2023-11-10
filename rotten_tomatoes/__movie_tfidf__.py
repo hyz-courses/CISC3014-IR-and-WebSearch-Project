@@ -202,7 +202,7 @@ def search(search_queries, idf_vector, tfidf_mat, titles, top_x):
             print(str(index_top+1) + ".")
             print("ID: " + str(top_10_id[index_top] + 2))
             print("Title: " + str(top_10_names[index_top]))
-            print("Sim score: " + str(similarity_scores[index_top]))
+            print("Sim score: " + str(similarity_scores[top_10_id[index_top]]))
 
 
 # Problems
@@ -227,9 +227,10 @@ def main():
         'Romance about Maja',
         'while the OwNeR of the nearby theme park',
         'former baby sitter',         # 27
+        #'typo test lalalala',
     ]
 
-    search(search_queries, idf_vector, tfidf_mat, titles, 1)
+    search(search_queries, idf_vector, tfidf_mat, titles, 3)
 
 
 main()
