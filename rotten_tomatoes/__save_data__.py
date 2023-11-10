@@ -3,9 +3,9 @@ import pandas as pd
 from openpyxl import load_workbook
 
 
-def save_data_to_excel(data, file_path="./movie_list/"):
+def save_data_to_excel(data, file_name="movie_data", file_path="./movie_list/"):
     # File name
-    file_name = "movie_data" + ".xlsx"
+    file_name = file_name + ".xlsx"
     file_location = file_path + file_name
 
     # Create data frame over processed data
