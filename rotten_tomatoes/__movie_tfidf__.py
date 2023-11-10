@@ -3,6 +3,9 @@ import re
 import pandas as pd
 from collections import Counter
 
+# local imports
+import __settings__
+
 
 # Read Excel file into dataframe
 def xls_to_df(file_path=""):
@@ -12,53 +15,58 @@ def xls_to_df(file_path=""):
 # ----------------- Document Part -------------------
 
 
+# Tokenize string into word array.
+# Input string is the content article of the movie.
+def tokenize(input_str):
+    # Define the splitting delimiters using regular expression
+    rule = r'[\s\~\`\!\@\#\$\%\^\&\*\(\)\-\_\+\=\{\}\[\]\;\:\'\"\,\<\.\>\/\?\\|]+'
+    re.compile(rule)
+
+    # Turn all letters in the string into lowercase
+    # This may contain empty member ''
+    terms_ = []
+    terms_ = terms_ + re.split(rule, input_str.lower())
+
+    # Remove the empty member ''
+    terms = []
+    for term in terms_:
+        if term != '':
+            terms.append(term)
+
+    last_word = terms[-1]
+    #print("last_word: " + last_word)
+    return terms
+
+
+# For a specific movie:
+# Extract term frequency for its article.
+# Example: {'in': 4, 'the': 6, 'retirement': 1}
+def get_term_freq(movie_item):
+    title = movie_item['title']
+    content = movie_item['content']
+
+    # Split content article into word array.
+    term_array = tokenize(content)
+
+    # Using word array, count term frequency.
+    # Term frequency: term:key -> frequency:value
+    movie_tf = Counter(term_array)
+    movie_tf = dict(movie_tf)
+
+    # Console logs
+    print("\n>> " + title)
+    # print(term_array)
+    print(movie_tf)
+
+    return movie_tf, title
+
+
 # Sum up all the term frequencies, create a vocab.
 # Output: vocabulary, and a vector of tf vectors. (2D vector)
 # 2D vector is like, [{'at':1, 'the':7}, {'susie':1, 'last':2}]
 # using set merge.
 def create_vocabulary(path="./movie_list/movie_content.xlsx"):
     movie_content = xls_to_df(file_path=path)
-
-    # Tokenize string into word array.
-    # Input string is the content article of the movie.
-    def tokenize(input_str):
-        # Define the splitting delimiters using regular expression
-        rule = r'[\s\~\`\!\@\#\$\%\^\&\*\(\)\-\_\+\=\{\}\[\]\;\:\'\"\,\<\.\>\/\?\\|]+'
-        re.compile(rule)
-
-        # Turn all letters in the string into lowercase
-        # This may contain empty member ''
-        terms_ = []
-        terms_ = terms_ + re.split(rule, input_str.lower())
-
-        # Remove the empty member ''
-        terms = []
-        for term in terms_:
-            if term != '':
-                terms.append(term)
-        return terms
-
-    # For a specific movie:
-    # Extract term frequency for its article.
-    # Example: {'in': 4, 'the': 6, 'retirement': 1}
-    def get_term_freq(movie_item):
-        title = movie_item['title']
-        content = movie_item['content']
-
-        # Split content article into word array.
-        term_array = tokenize(content)
-
-        # Using word array, count term frequency.
-        # Term frequency: term:key -> frequency:value
-        movie_tf = Counter(term_array)
-        movie_tf = dict(movie_tf)
-
-        # Console logs
-        print("\n>> " + title)
-        # print(term_array)
-        print(movie_tf)
-
-        return movie_tf, title
 
     # Initialize vocabulary set and term frequency array.
     vocab = set()
@@ -109,9 +117,16 @@ def create_tfidf_mat(term_freq_mat):
     # Inverse document frequency.
     # idf(term) = log(movie number) / 1 + (numer of movies containing this term)
     def calc_idf(term_freq_mat):
+        doc_num = term_freq_mat.shape[1]
         freq = np.count_nonzero(term_freq_mat, axis=1)
-        idf = np.log(term_freq_mat.shape[1]) / 1 + freq
+        idf = np.log(doc_num) / (1 + freq)
         idf = np.reshape(idf, (len(idf), 1))
+
+        # Filter words that are very common.
+        # I can use nltk, but this is simpler.
+        if __settings__.custom_settings['RM_COMMON_WORDS']:
+            min_idf = np.log(doc_num) / (1 + doc_num)
+            idf[idf == min_idf] = 0
 
         print("\n>>>> Inverse Document Frequency")
         print(idf)
@@ -158,13 +173,19 @@ def cosine_compare(query, idf_vector, tfidf_mat):
 
     return similarity_scores
 
-def get_top_x(similarity_scores, top_x, titles):
-    # 获取前10个最高分数对应的索引
-    top_x_scores = sorted(range(len(similarity_scores)), key=lambda i: similarity_scores[i], reverse=True)[:top_x]
+
+def get_top_x_id(similarity_scores, top_x):
+    # 获取前 top_x 个最高分数对应的索引
+    sorted_similarity_scores = np.argsort(similarity_scores)[::-1]  # 按降序排序并获取索引
+    top_x_scores = sorted_similarity_scores[:top_x]
+    return top_x_scores
+
+
+def get_top_x_names(similarity_scores, top_x, titles):
+    top_x_scores = get_top_x_id(similarity_scores, top_x)
     top_x_names = []
     for score in top_x_scores:
         top_x_names.append(titles[score])
-
     return top_x_names
 
 
@@ -172,16 +193,37 @@ def main():
     tf_mat, titles = create_tf_mat(path='./movie_list/movie_content.xlsx')
     tfidf_mat, idf_vector = create_tfidf_mat(tf_mat)
     search_queries = [
-        'friend revenge',
-        'dog love',
-        'big cage',
+        'discover how important',       # back of 29
+        'on the brink of losing her',      # head of 29
+        'Samuel suddenly vanishes',
+        'more to her father',   # back of 111
+        'retirement plan',   # head of 111
+        'russell bufalino',     # 102
+        'retired glamorous',   # 17
+        'retired glamorous city',   # ought to be 17, but the word "city" is too strong...
+        'After rescuing a young boy from ruthless child traffickers',
+        'Romance about Maja',
+        'while the OwNeR of the nearby theme park',
     ]
 
-    query = search_queries[0]
-    similarity_scores = cosine_compare(query,idf_vector,tfidf_mat)
-    top_10_names = get_top_x(similarity_scores, 10, titles)
-    # 打印结果
-    print(top_10_names)
+    # Problems
+    # 1. Sensitive to common words: the, a, an, they, theirs, city, etc.
+    # Solution: Filter words with min idf
+    # 2. Bad typo-tolerance: Typo may cause an overflow of array.
+    # Solution: Further machine learning techniques....
+
+    query = search_queries[1]
+
+    similarity_scores = cosine_compare(query, idf_vector, tfidf_mat)
+    top_10_id = get_top_x_id(similarity_scores, 1)
+    top_10_names = get_top_x_names(similarity_scores, 1, titles)
+
+    # Print Results
+    print("Search Result is as follows:")
+    print("ID: "+str(top_10_id[0]+2))
+    print("Title: " + str(top_10_names[0]))
+    print(titles)
+    print(tf_mat.index[0])
 
 
 
