@@ -12,9 +12,8 @@ def xls_to_df(file_path=""):
     df = pd.read_excel(file_path)
     return df
 
+
 # ----------------- Document Part -------------------
-
-
 # Tokenize string into word array.
 # Input string is the content article of the movie.
 def tokenize(input_str):
@@ -189,12 +188,35 @@ def get_top_x_names(similarity_scores, top_x, titles):
     return top_x_names
 
 
+def search(search_queries, idf_vector, tfidf_mat, titles, top_x):
+    print(" ------------- Totally " + str(len(search_queries)) + " search attempts! -------------")
+    for index_search, query in enumerate(search_queries):
+        similarity_scores = cosine_compare(query, idf_vector, tfidf_mat)
+        top_10_id = get_top_x_id(similarity_scores, top_x)
+        top_10_names = get_top_x_names(similarity_scores, top_x, titles)
+
+        # Print Results
+        print("\033[32m"+"\n"+str(index_search)+". Searched for: \"" + query + "\"")
+        print("Top " + str(top_x) + " relevant:"+"\033[0m")
+        for index_top in range(0, len(top_10_id)):
+            print(str(index_top+1) + ".")
+            print("ID: " + str(top_10_id[index_top] + 2))
+            print("Title: " + str(top_10_names[index_top]))
+            print("Sim score: " + str(similarity_scores[index_top]))
+
+
+# Problems
+# 1. Sensitive to common words: the, a, an, they, theirs, city, etc.
+# Solution: Filter words with min idf
+# 2. Bad typo-tolerance: Typo may cause an overflow of array.
+# Solution: Further machine learning techniques....
+
 def main():
     tf_mat, titles = create_tf_mat(path='./movie_list/movie_content.xlsx')
     tfidf_mat, idf_vector = create_tfidf_mat(tf_mat)
     search_queries = [
-        'discover how important',       # back of 29
-        'on the brink of losing her',      # head of 29
+        'discover how important',               # back of 29
+        'on the brink of losing her',           # head of 3
         'Samuel suddenly vanishes',
         'more to her father',   # back of 111
         'retirement plan',   # head of 111
@@ -204,29 +226,10 @@ def main():
         'After rescuing a young boy from ruthless child traffickers',
         'Romance about Maja',
         'while the OwNeR of the nearby theme park',
+        'former baby sitter',         # 27
     ]
 
-    # Problems
-    # 1. Sensitive to common words: the, a, an, they, theirs, city, etc.
-    # Solution: Filter words with min idf
-    # 2. Bad typo-tolerance: Typo may cause an overflow of array.
-    # Solution: Further machine learning techniques....
-
-    query = search_queries[1]
-
-    similarity_scores = cosine_compare(query, idf_vector, tfidf_mat)
-    top_10_id = get_top_x_id(similarity_scores, 1)
-    top_10_names = get_top_x_names(similarity_scores, 1, titles)
-
-    # Print Results
-    print("Search Result is as follows:")
-    print("ID: "+str(top_10_id[0]+2))
-    print("Title: " + str(top_10_names[0]))
-    print(titles)
-    print(tf_mat.index[0])
-
-
-
+    search(search_queries, idf_vector, tfidf_mat, titles, 1)
 
 
 main()
