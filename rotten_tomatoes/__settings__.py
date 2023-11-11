@@ -2,9 +2,16 @@ import math
 import numpy as np
 import pandas as pd
 
+scripts = {
+    'WELCOME': 'Welcome to tfidf searcher!',
+    'R_CHEVRON': '>>>>>>>>>>>>>>>> ',
+    'L_CHEVRON': ' <<<<<<<<<<<<<<<<',
+}
 
 custom_settings = {
-    'RM_COMMON_WORDS': False,
+    'RM_COMMON_WORDS': True,
+    'TYPE_SEARCH': True,
+    'CONSOLE_LOG_PROCESS': False,
 }
 
 

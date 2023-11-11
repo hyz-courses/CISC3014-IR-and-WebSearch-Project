@@ -53,9 +53,10 @@ def get_term_freq(movie_item):
     movie_tf = dict(movie_tf)
 
     # Console logs
-    print("\n>> " + title)
-    # print(term_array)
-    print(movie_tf)
+    if __settings__.custom_settings['CONSOLE_LOG_PROCESS']:
+        print("\n>> " + title)
+        # print(term_array)
+        print(movie_tf)
 
     return movie_tf, title
 
@@ -84,8 +85,9 @@ def create_vocabulary(path="./movie_list/movie_content.xlsx"):
     vocab = list(vocab)
 
     # Console Log
-    print("\n>>>> Vocab")
-    print(vocab)
+    if __settings__.custom_settings['CONSOLE_LOG_PROCESS']:
+        print("\n>>>> Vocab")
+        print(vocab)
 
     return vocab, term_freqs, titles
 
@@ -104,8 +106,9 @@ def create_tf_mat(path="./movie_list/movie_content.xlsx"):
         for key, value in term_freq.items():
             term_freq_mat.loc[key, index] = value
 
-    print('\n>>>> Term Frequency Matrix')
-    print(term_freq_mat)
+    if __settings__.custom_settings['CONSOLE_LOG_PROCESS']:
+        print('\n>>>> Term Frequency Matrix')
+        print(term_freq_mat)
 
     return term_freq_mat, titles
 
@@ -116,8 +119,11 @@ def create_tfidf_mat(term_freq_mat):
     # Inverse document frequency.
     # idf(term) = log(movie number) / 1 + (numer of movies containing this term)
     def calc_idf(term_freq_mat):
+        # Number of movies
         doc_num = term_freq_mat.shape[1]
+        # Number of movies that contains index in tf matrix
         freq = np.count_nonzero(term_freq_mat, axis=1)
+        # Inverse document frequency
         idf = np.log(doc_num) / (1 + freq)
         idf = np.reshape(idf, (len(idf), 1))
 
@@ -127,14 +133,18 @@ def create_tfidf_mat(term_freq_mat):
             min_idf = np.log(doc_num) / (1 + doc_num)
             idf[idf == min_idf] = 0
 
-        print("\n>>>> Inverse Document Frequency")
-        print(idf)
+        if __settings__.custom_settings['CONSOLE_LOG_PROCESS']:
+            print("\n>>>> Inverse Document Frequency")
+            print(idf)
         return idf
 
+    # idf
     idf_vector = calc_idf(term_freq_mat)
+    # tf-idf matrix
     tfidf_mat = term_freq_mat * idf_vector
-    print("\n>>>> tf-idf Matrix")
-    print(tfidf_mat)
+    if __settings__.custom_settings['CONSOLE_LOG_PROCESS']:
+        print("\n>>>> tf-idf Matrix")
+        print(tfidf_mat)
     return tfidf_mat, idf_vector
 
 
@@ -174,8 +184,8 @@ def cosine_compare(query, idf_vector, tfidf_mat):
 
 
 def get_top_x_id(similarity_scores, top_x):
-    # 获取前 top_x 个最高分数对应的索引
-    sorted_similarity_scores = np.argsort(similarity_scores)[::-1]  # 按降序排序并获取索引
+    # Fetch top x most relevant.
+    sorted_similarity_scores = np.argsort(similarity_scores)[::-1]  # Descending order sort
     top_x_scores = sorted_similarity_scores[:top_x]
     return top_x_scores
 
@@ -196,7 +206,7 @@ def search(search_queries, idf_vector, tfidf_mat, titles, top_x):
         top_10_names = get_top_x_names(similarity_scores, top_x, titles)
 
         # Print Results
-        print("\033[32m"+"\n"+str(index_search)+". Searched for: \"" + query + "\"")
+        print("\033[32m"+str(index_search)+". Searched for: \"" + query + "\"")
         print("Top " + str(top_x) + " relevant:"+"\033[0m")
         for index_top in range(0, len(top_10_id)):
             print(str(index_top+1) + ".")
@@ -230,7 +240,23 @@ def main():
         #'typo test lalalala',
     ]
 
-    search(search_queries, idf_vector, tfidf_mat, titles, 3)
+    if __settings__.custom_settings['TYPE_SEARCH']:
+        print(
+                "\n\033[32m" +
+                __settings__.scripts['R_CHEVRON'] +
+                __settings__.scripts['WELCOME'] +
+                __settings__.scripts['L_CHEVRON'] +
+                "\033[0m"
+              )
+        while True:
+            query_arr_encap = []
+            q = input("\n>> What do you want to search? ")
+            if q == 'break()':
+                break
+            query_arr_encap.append(q)
+            search(query_arr_encap, idf_vector, tfidf_mat, titles, 1)
+    else:
+        search(search_queries, idf_vector, tfidf_mat, titles, 1)
 
 
 main()
