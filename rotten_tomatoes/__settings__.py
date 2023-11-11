@@ -2,10 +2,15 @@ import math
 import numpy as np
 import pandas as pd
 
-scripts = {
+special_strings = {
     'WELCOME': 'Welcome to tfidf searcher!',
-    'R_CHEVRON': '>>>>>>>>>>>>>>>> ',
-    'L_CHEVRON': ' <<<<<<<<<<<<<<<<',
+    'EMOJI': '（づ￣3￣）づ╭❤～',
+    'R_CHEVRON': '>>>>>>>>>>> ',
+    'L_CHEVRON': ' <<<<<<<<<<<',
+}
+
+special_scripts = {
+    'BREAK_WHILE_LOOP': 'break()',
 }
 
 custom_settings = {

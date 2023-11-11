@@ -199,7 +199,7 @@ def get_top_x_names(similarity_scores, top_x, titles):
 
 
 def search(search_queries, idf_vector, tfidf_mat, titles, top_x):
-    print(" ------------- Totally " + str(len(search_queries)) + " search attempts! -------------")
+    print("------------- Totally " + str(len(search_queries)) + " search attempts! -------------")
     for index_search, query in enumerate(search_queries):
         similarity_scores = cosine_compare(query, idf_vector, tfidf_mat)
         top_10_id = get_top_x_id(similarity_scores, top_x)
@@ -243,18 +243,19 @@ def main():
     if __settings__.custom_settings['TYPE_SEARCH']:
         print(
                 "\n\033[32m" +
-                __settings__.scripts['R_CHEVRON'] +
-                __settings__.scripts['WELCOME'] +
-                __settings__.scripts['L_CHEVRON'] +
+                __settings__.special_strings['R_CHEVRON'] +
+                __settings__.special_strings['WELCOME'] +
+                __settings__.special_strings['EMOJI'] +
+                __settings__.special_strings['L_CHEVRON'] +
                 "\033[0m"
               )
         while True:
             query_arr_encap = []
             q = input("\n>> What do you want to search? ")
-            if q == 'break()':
+            if q == __settings__.special_scripts['BREAK_WHILE_LOOP']:
                 break
             query_arr_encap.append(q)
-            search(query_arr_encap, idf_vector, tfidf_mat, titles, 1)
+            search(query_arr_encap, idf_vector, tfidf_mat, titles, 3)
     else:
         search(search_queries, idf_vector, tfidf_mat, titles, 1)
 
