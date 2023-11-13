@@ -75,13 +75,10 @@ def create_vocabulary(path="./movie_list/movie_content.xlsx"):
 
     # For ALL movies:
     for index, row in movie_content.iterrows():
-        # Get its term frequency vector.
-        tf, title = get_term_freq(row)
-        titles.append(title)
-        # Merge terms into vocabulary first, and
+        tf, title = get_term_freq(row)  # Get its term frequency vector.
+        titles.append(title)            # Merge terms into vocabulary first, and
         vocab.update(tf.keys())
-        # Store in a unified term frequency matrix.
-        term_freqs.append(tf)
+        term_freqs.append(tf)           # Store in a unified term frequency matrix.
     vocab = list(vocab)
 
     # Console Log
@@ -119,10 +116,9 @@ def create_tfidf_mat(term_freq_mat):
     # Inverse document frequency.
     # idf(term) = log(movie number) / 1 + (numer of movies containing this term)
     def calc_idf(term_freq_mat):
-        # Number of movies
-        doc_num = term_freq_mat.shape[1]
-        # Number of movies that contains index in tf matrix
-        freq = np.count_nonzero(term_freq_mat, axis=1)
+        doc_num = term_freq_mat.shape[1]                    # Number of movies
+        freq = np.count_nonzero(term_freq_mat, axis=1)      # Doc frequency
+
         # Inverse document frequency
         idf = np.log(doc_num) / (1 + freq)
         idf = np.reshape(idf, (len(idf), 1))
@@ -133,15 +129,17 @@ def create_tfidf_mat(term_freq_mat):
             min_idf = np.log(doc_num) / (1 + doc_num)
             idf[idf == min_idf] = 0
 
+        # Console Log
         if __settings__.custom_settings['CONSOLE_LOG_PROCESS']:
             print("\n>>>> Inverse Document Frequency")
             print(idf)
         return idf
 
-    # idf
+    # Inverse Document Frequency
     idf_vector = calc_idf(term_freq_mat)
     # tf-idf matrix
     tfidf_mat = term_freq_mat * idf_vector
+    # Console Log
     if __settings__.custom_settings['CONSOLE_LOG_PROCESS']:
         print("\n>>>> tf-idf Matrix")
         print(tfidf_mat)
@@ -216,12 +214,11 @@ def search(search_queries, idf_vector, tfidf_mat, titles, top_x):
         similarity_scores, is_success = cosine_compare(query, idf_vector, tfidf_mat)
         # Exception: Query size doesn't fit!
         if not is_success:
-            print("\033[31m$ Warning! Word not exist, try another one.\033[0m\n")
+            print("\033[31m$ Warning: Word not exist, try another one.\033[0m\n")
             return
-        # Sort from high to low, return index.
-        top_x_id = get_top_x_id(similarity_scores, top_x)
-        # Use index to retrieve title.
-        top_x_names = get_top_x_names(similarity_scores, top_x, titles)
+
+        top_x_id = get_top_x_id(similarity_scores, top_x)   # Sort from high to low, return index.
+        top_x_names = get_top_x_names(similarity_scores, top_x, titles)     # Use index to retrieve title.
 
         # Print Results
         # Title
@@ -229,6 +226,7 @@ def search(search_queries, idf_vector, tfidf_mat, titles, top_x):
         print("\033[32m" + index + "Searched for: \"" + query + "\"\n" +
               "Top " + str(top_x) + " relevant:" + "\033[0m"
               )
+
         # Topx x result!
         for index_top in range(0, len(top_x_id)):
             # index_top -> top_x_id -> score
