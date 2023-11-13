@@ -17,6 +17,7 @@ custom_settings = {
     'RM_COMMON_WORDS': True,
     'TYPE_SEARCH': True,
     'CONSOLE_LOG_PROCESS': False,
+    'TOP_X': 5,
 }
 
 

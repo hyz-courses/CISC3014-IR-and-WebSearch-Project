@@ -1,0 +1,32 @@
+{\rtf1\ansi\ansicpg1252\cocoartf2757
+\cocoatextscaling0\cocoaplatform0{\fonttbl\f0\fnil\fcharset0 AmericanTypewriter;}
+{\colortbl;\red255\green255\blue255;}
+{\*\expandedcolortbl;;}
+{\*\listtable{\list\listtemplateid1\listhybrid{\listlevel\levelnfc0\levelnfcn0\leveljc0\leveljcn0\levelfollow0\levelstartat1\levelspace360\levelindent0{\*\levelmarker \{decimal\}.}{\leveltext\leveltemplateid1\'02\'00.;}{\levelnumbers\'01;}\fi-360\li720\lin720 }{\listname ;}\listid1}}
+{\*\listoverridetable{\listoverride\listid1\listoverridecount0\ls1}}
+\paperw11900\paperh16840\margl1440\margr1440\vieww14920\viewh16520\viewkind0
+\pard\tx566\tx1133\tx1700\tx2267\tx2834\tx3401\tx3968\tx4535\tx5102\tx5669\tx6236\tx6803\pardirnatural\qc\partightenfactor0
+
+\f0\fs40 \cf0 Second Crawler\
+\pard\tx566\tx1133\tx1700\tx2267\tx2834\tx3401\tx3968\tx4535\tx5102\tx5669\tx6236\tx6803\pardirnatural\partightenfactor0
+\cf0 	Having the url list, we have the second crawler to crawl movie contents of each movie. One movie, with one url, which leads to one movie content, i.e., plots. We wrote a special function to read excel file and form an array of movie urls.\
+\
+	The url leads to the detail page of a movie. The plot is stored in a paragraph element, having attribute slot="content". So we can extract it using xpath.\
+\
+	Here is the code. We first initialize the start url by calling the get_movie_url function. Then, in start_requests() function, there is a for loop, traversing each start url. In each for loop, the function parse is called with the corresponding url as parameter.\
+\
+	The xpath retrieving the plot is "//p[@slot='content']/text()". We use regular expression tools to remove enters and tabs. Lastly, we store the retrieved content data into another excel file.\
+\
+\pard\tx566\tx1133\tx1700\tx2267\tx2834\tx3401\tx3968\tx4535\tx5102\tx5669\tx6236\tx6803\pardirnatural\qc\partightenfactor0
+\cf0 TF-IDF Matrix & Search\
+\pard\tx566\tx1133\tx1700\tx2267\tx2834\tx3401\tx3968\tx4535\tx5102\tx5669\tx6236\tx6803\pardirnatural\partightenfactor0
+\cf0 	The rest part is very simple. \
+\pard\tx220\tx720\tx1133\tx1700\tx2267\tx2834\tx3401\tx3968\tx4535\tx5102\tx5669\tx6236\tx6803\li720\fi-720\pardirnatural\partightenfactor0
+\ls1\ilvl0\cf0 {\listtext	1.	}For each plot as a single string, tokenize it into an array of words;\
+{\listtext	2.	}Sums the duplicates within each array, forming a term-frequency vector. Each tf vector corresponds to a movie plot;\
+{\listtext	3.	}Combine multiple vectors into a tf matrix.\
+{\listtext	4.	}Lastly, calculate idf and forms a tf-idf matrix.\
+\pard\tx566\tx1133\tx1700\tx2267\tx2834\tx3401\tx3968\tx4535\tx5102\tx5669\tx6236\tx6803\pardirnatural\partightenfactor0
+\cf0 \
+	Let me give you a demo.\
+}
