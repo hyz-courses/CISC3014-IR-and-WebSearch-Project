@@ -33,7 +33,7 @@ def tokenize(input_str):
             terms.append(term)
 
     last_word = terms[-1]
-    #print("last_word: " + last_word)
+    # print("last_word: " + last_word)
     return terms
 
 
@@ -160,8 +160,8 @@ def cosine_compare(query, idf_vector, tfidf_mat):
     # Query tf-idf Vector
     def create_query_tfidf_vector(query, idf_vector):
         # Tokenizes query into term 2D vector
-        q_term = query.lower().split(' ')   # lowercase, split by space
-        q_term_freq = Counter(q_term)       # remove duplicates, make into dictionary
+        q_term = tokenize(query)
+        q_term_freq = Counter(q_term)  # remove duplicates, make into dictionary
         q_term_freq = dict(q_term_freq)
 
         # Query tf vector
@@ -170,19 +170,19 @@ def cosine_compare(query, idf_vector, tfidf_mat):
             q_tf_vector.loc[key] = value
 
         # Query tfidf vector
-        # Checks if the sizes matches
+        # Error handling: Size doesn't mach
         if q_tf_vector.shape[0] != idf_vector.shape[0] or q_tf_vector.shape[1] != idf_vector.shape[1]:
             return q_tf_vector, False
-        # size matches
+        # Size matches
         q_tfidf_vector = q_tf_vector * idf_vector
         return q_tfidf_vector, True
 
     # Compare query tfidf vector with all columns of tfidf_mat
     q_tfidf_vector, is_success = create_query_tfidf_vector(query, idf_vector)
-    # Size don't match
+    # Error handling: Size don't match
     if not is_success:
         return [], False
-    # Size matches
+    # Size matches, continue.
     similarity_scores = []
     for doc in tfidf_mat.columns:
         doc_vector = tfidf_mat[doc]
@@ -224,18 +224,24 @@ def search(search_queries, idf_vector, tfidf_mat, titles, top_x):
         top_x_names = get_top_x_names(similarity_scores, top_x, titles)
 
         # Print Results
+        # Title
         index = str(index_search) + ". " if len(search_queries) > 1 else ""
-        print("\033[32m" + index + "Searched for: \"" + query + "\"")
-        print("Top " + str(top_x) + " relevant:" + "\033[0m")
+        print("\033[32m" + index + "Searched for: \"" + query + "\"\n" +
+              "Top " + str(top_x) + " relevant:" + "\033[0m"
+              )
+        # Topx x result!
         for index_top in range(0, len(top_x_id)):
+            # index_top -> top_x_id -> score
             this_similarity_score = similarity_scores[top_x_id[index_top]]
             if this_similarity_score == 0:
                 print("\033[33m\n$ Warning: No more related movies!!\033[0m")
                 break
-            print(str(index_top+1) + ".")
-            print("ID: " + str(top_x_id[index_top] + 2))
-            print("Title: " + str(top_x_names[index_top]))
-            print("Sim score: " + str(this_similarity_score))
+            print(str(index_top + 1) + ".\n" +
+                  "ID: " + str(top_x_id[index_top] + 2) + "\n" +
+                  "Title: " + str(top_x_names[index_top]) + "\n" +
+                  "Sim score: " + str(this_similarity_score)
+                  )
+        print("\033[32mSearch is complete!\033[0m")
 
 
 # Problems
@@ -246,9 +252,10 @@ def search(search_queries, idf_vector, tfidf_mat, titles, top_x):
 
 # Presentation guideline:
 # 1. Purposely make a typo, yield an error.
-# 2. Use "theme park" to display the cascading feature;
+# 2. Use "theme park" to display the cascading feature.
 # 3. Use "six year old" and "year old" to show the common word's problem.
-# 4. Do some random searches.
+# 4. Use "discover how important" to show the sequence problem.
+# 5. Type in some common words, like "city", and "boy".
 
 def main():
     # Term frequency matrix & title array.
@@ -259,41 +266,41 @@ def main():
     _top_x = __settings__.custom_settings['TOP_X']
     # Default search queries.
     search_queries = [
-        'discover how important',               # back of 29
-        'on the brink of losing her',           # head of 3
+        'discover how important',  # back of 29
+        'on the brink of losing her',  # head of 3
         'Samuel suddenly vanishes',
-        'more to her father',   # back of 111
-        'retirement plan',   # head of 111
-        'russell bufalino',     # 102
-        'retired glamorous',   # 17
-        'retired glamorous city',   # ought to be 17, but the word "city" is too strong...
+        'more to her father',  # back of 111
+        'retirement plan',  # head of 111
+        'russell bufalino',  # 102
+        'retired glamorous',  # 17
+        'retired glamorous city',  # ought to be 17, but the word "city" is too strong...
         'After rescuing a young boy from ruthless child traffickers',
         'Romance about Maja',
         'while the OwNeR of the nearby theme park',
-        'former baby sitter',         # 27
-        #'typo test lalalala',
+        'former baby sitter',  # 27
+        # 'typo test lalalala',
     ]
 
     if __settings__.custom_settings['TYPE_SEARCH']:
         # Welcome Screen!
         print(
-                "\n\033[32m" +
-                __settings__.special_strings['R_CHEVRON'] +
-                __settings__.special_strings['WELCOME'] +
-                __settings__.special_strings['EMOJI'] +
-                __settings__.special_strings['L_CHEVRON'] +
-                "\033[0m"
-              )
+            "\n\033[32m" +
+            __settings__.special_strings['R_CHEVRON'] +
+            __settings__.special_strings['WELCOME'] +
+            __settings__.special_strings['EMOJI'] +
+            __settings__.special_strings['L_CHEVRON'] +
+            "\033[0m"
+        )
         # Don't halt when a search is done. Do some more.
         while True:
             query_arr_encap = []
-            input_query = input("\n>> What do you want to search? ")              # User input a search query.
+            input_query = input("\n>> What do you want to search? ")  # User input a search query.
             # Read user inputs.
             if input_query == __settings__.special_scripts['BREAK_WHILE_LOOP']:
                 # A means to halt the while-loop.
                 break
             query_arr_encap.append(input_query)
-            search(query_arr_encap, idf_vector, tfidf_mat, titles, _top_x)       # Perform search
+            search(query_arr_encap, idf_vector, tfidf_mat, titles, _top_x)  # Perform search
     else:
         search(search_queries, idf_vector, tfidf_mat, titles, _top_x)
 
