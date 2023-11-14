@@ -307,14 +307,94 @@ def cosine_compare(query, idf_vector, tfidf_mat):
 It is important to turn query into a tf-idf vector first.
 
 ### 5.2. Exception Handler: Unknown words.
-&emsp; One drawback of the tf-idf model is that it won't recognize any query word that doesn't exist in the index of the tf-idf matrix. Giving a new term in the query will cause an exception that the length of the query tf-idf vector will is longer than the index of the matrix, resulting a shape-unmatch. To prevent python from halting, the exception handler is place as a guardian:
+&emsp; One drawback of the tf-idf model is that it won't recognize any query word that doesn't exist in the index of the tf-idf matrix. Giving a new term in the query will cause an exception that the length of the query tf-idf vector will become longer than the index of the matrix, resulting a shape-unmatch. To prevent python from halting, the exception handler is place as a guardian:
+
 ```python
-        # Error handling: Size doesn't mach
-        if q_tf_vector.shape[0] != idf_vector.shape[0] or q_tf_vector.shape[1] != idf_vector.shape[1]:
-            return q_tf_vector, False
+    # Error handling: Size doesn't mach
+    if q_tf_vector.shape[0] != idf_vector.shape[0] or q_tf_vector.shape[1] != idf_vector.shape[1]:
+        return q_tf_vector, False
 ```
-It basically just detects a shape-unmatch in advance and skip the following code that's meant to be failing.
+
+It basically just detects a shape-unmatch in advance and skip the following code that's meant to be failing. Once a failure is detected, a ``False`` value will be returned.
 ### 5.3. Display Results
+&emsp; The key of displaying results is to sort the score array while still preserving its index. The index is an integer pointing to the ``titles`` array that stores the movie titles. This function will return the indexes (not values) of the top x scored movies.
+```python
+def get_top_x_id(similarity_scores, top_x):
+    # Fetch top x most relevant.
+    # Sort array into descending order. Keep the original index.
+    sorted_similarity_scores = np.argsort(similarity_scores)[::-1]
+    top_x_id = sorted_similarity_scores[:top_x]
+    return top_x_id
+```
+Having the indexes, it can't be easier to find the movie titles:
+```python
+def get_top_x_names(similarity_scores, top_x, titles):
+    top_x_id = get_top_x_id(similarity_scores, top_x)
+    top_x_names = []
+    for id in top_x_id:
+        top_x_names.append(titles[id])
+    return top_x_names
+```
+The search function takes an input of a search query, and calls the ``cosine_compare()`` function to perform the scoring. Besides printing the result, it also prints the similarity scores. To find the score, we should first find the top x indexes, and then use the index to find the corresponding score. 
+```python
+def search(search_queries, idf_vector, tfidf_mat, titles, top_x):
+    if len(search_queries) > 1:
+        print("------------- Totally " + str(len(search_queries)) + " search attempts! -------------")
+
+    for index_search, query in enumerate(search_queries):
+        # Scores, in sequence of movies
+        similarity_scores, is_success = cosine_compare(query, idf_vector, tfidf_mat)
+        # Exception: Query size doesn't fit!
+        if not is_success:
+            print("\033[31m$ Warning: Word not exist, try another one.\033[0m\n")
+            return
+
+        top_x_id = get_top_x_id(similarity_scores, top_x)   # Sort from high to low, return index.
+        top_x_names = get_top_x_names(similarity_scores, top_x, titles)     # Use index to retrieve title.
+
+        # Print Results
+        # Title
+        index = str(index_search) + ". " if len(search_queries) > 1 else ""
+        print("\033[32m" + index + "Searched for: \"" + query + "\"\n" +
+              "Top " + str(top_x) + " relevant:" + "\033[0m"
+              )
+
+        # Topx x result!
+        for index_top in range(0, len(top_x_id)):
+            # index_top -> top_x_id -> score
+            this_similarity_score = similarity_scores[top_x_id[index_top]]
+            if this_similarity_score == 0:
+                print("\033[33m\n$ Warning: No more related movies!!\033[0m")
+                break
+            print(str(index_top + 1) + ".\n" +
+                  "ID: " + str(top_x_id[index_top] + 2) + "\n" +
+                  "Title: " + str(top_x_names[index_top]) + "\n" +
+                  "Sim score: " + str(this_similarity_score)
+                  )
+        print("\033[32mSearch is complete!\033[0m")
+```
+On receiving a ``False`` message, the ``search()`` function prints an error message instead of raises an error.
+
+&emsp; To make a consistent user interface, we uses a while-loop to constantly takes user input:
+```python
+    while True:
+        query_arr_encap = []
+        input_query = input("\n>> What do you want to search? ")  # User input a search query.
+        # Read user inputs.
+        if input_query == __settings__.special_scripts['BREAK_WHILE_LOOP']:
+            # A means to halt the while-loop.
+            break
+        if input_query == __settings__.special_scripts['LIST_ALL']:
+            # List all movies
+            for index, title in enumerate(titles):
+                print("ID: " + str(index+2) + "\n" + "Title: " + title + "\n")
+            continue
+
+        # Search the user input query
+        query_arr_encap.append(input_query)
+        search(query_arr_encap, idf_vector, tfidf_mat, titles, _top_x)  # Perform search
+```
+This loop will only halt when the user types in the pre-set string ``break()``. Searcher can also list all the movies by typing the ``ls`` command. A shape-unmatch exception caused by an unknown word won't terminate it because it is handled in the ``search()`` function.
 ### 5.4. Common Words problem handler.
 
 &emsp; The old one's still there, take a look:
