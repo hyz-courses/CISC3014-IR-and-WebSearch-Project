@@ -76,8 +76,9 @@ def get_movie_url():
             }
             yield scrapy.Request(url=url, headers=headers, callback=self.parse)
 ```
+![Image](/screenshots/rotten_tomatoes_top_movies.png)
 
-&emsp; The following is quite the same. We retrieve the title & contents of each crawler, and store them into an Excel file. Before storing each plot twist, we remove all the return and tab characters. 
+&emsp; The following is quite the same. The plot twist is stored in a ``<p>`` element with parameter ``slot="content"``. We retrieve the title & contents of each crawler, and store them into an Excel file. Before storing each plot twist, we remove all the return and tab characters. 
 
 &emsp; Evidently, each movie corresponds to its own plot twists, in other words, articles. These articles will then be used to build a tf-idf search model.
 
