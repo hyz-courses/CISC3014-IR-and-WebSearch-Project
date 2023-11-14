@@ -2,23 +2,27 @@
 
 <!-- vscode-markdown-toc -->
 
-[1. Introduction to Rotten Tomatoes](#IntroductiontoRottenTomatoes)
-[2. First Crawler `__get_movies__.py`](#FirstCrawler__get_movies__.py)
-[3. Second Crawler `__get_movie_detail__.py`](#SecondCrawler__get_movie_detail__.py)
-[4. TF-IDF Model building](#TF-IDFModelbuilding)
+- [1. Introduction to Rotten Tomatoes](#IntroductiontoRottenTomatoes)
 
-- [4.1. Tokenize each article into an array.](#Tokenizeeacharticleintoanarray.)
-- [4.2. For each array, remove duplicates and form a term-frequency vector.](#Foreacharrayremoveduplicatesandformaterm-frequencyvector.)
-- [4.3. Further combine tf vectors into tf matrix.](#Furthercombinetfvectorsintotfmatrix.)
-- [4.4. Using tf matrix, calculate inverse document frequency vector, then build tf-idf matrix.](#Usingtfmatrixcalculateinversedocumentfrequencyvectorthenbuildtf-idfmatrix.)
+- [2. First Crawler `__get_movies__.py`](#FirstCrawler__get_movies__.py)
 
-[5. Query Search & Problems](#QuerySearchProblems)
+- [3. Second Crawler `__get_movie_detail__.py`](#SecondCrawler__get_movie_detail__.py)
 
-- [5.1. Cosine Similarity](#CosineSimilarity)
-- [5.2. Exception Handler: Unknown words.](#ExceptionHandler:Unknownwords.)
-- [5.3. Display Results](#DisplayResults)
-- [5.4. Problem Handler: Common Words Problem.](#ProblemHandler:CommonWordsProblem.)
-- [5.5. An example of a common search result.](#an-example-of-a-common-search-result)
+- [4. TF-IDF Model building](#TF-IDFModelbuilding)
+
+- [&emsp; 4.1. Tokenize each article into an array.](#Tokenizeeacharticleintoanarray.)
+
+- [&emsp; 4.2. For each array, remove duplicates and form a term-frequency vector.](#Foreacharrayremoveduplicatesandformaterm-frequencyvector.)
+- [&emsp; 4.3. Further combine tf vectors into tf matrix.](#Furthercombinetfvectorsintotfmatrix.)
+- [&emsp; 4.4. Using tf matrix, calculate inverse document frequency vector, then build tf-idf matrix.](#Usingtfmatrixcalculateinversedocumentfrequencyvectorthenbuildtf-idfmatrix.)
+
+- [5. Query Search & Problems](#QuerySearchProblems)
+
+- [&emsp; 5.1. Cosine Similarity](#CosineSimilarity)
+- [&emsp; 5.2. Exception Handler: Unknown words.](#52-exception-handler-unknown-words)
+- [&emsp; 5.3. Display Results](#DisplayResults)
+- [&emsp; 5.4. Problem Handler: Common Words Problem.](#54-problem-handler-common-words-problem)
+- [&emsp; 5.5. An example of a common search result.](#an-example-of-a-common-search-result)
 
 <!-- vscode-markdown-toc-config
 	numbering=true
