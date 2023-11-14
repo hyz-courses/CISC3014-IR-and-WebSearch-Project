@@ -463,7 +463,7 @@ Sim score: 0.15211712289647808
 &emsp; Our solution is idf casting. To be frank, it just cuts the word that's existed for a certain amount. For example, if I don't want the word that has existed in more than 50% of the document, I can just assign a 0 to any idf that is equal or below to this value:
 
 
-$$\[\text{{IDF}}(t, D) = \log \left( \frac{{N}}{{\text{{0.5N}}(t, D) + 1}} \right)\]$$
+$$\[\text{{IDF}}(t, D) = \log \left( \frac{{N}}{{\text{{0.5N}} + 1}} \right)\]$$
 
 &emsp; This can be performed when calculating idf:
 ```python
