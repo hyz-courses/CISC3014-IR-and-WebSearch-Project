@@ -238,6 +238,40 @@ which yields to be:
  [1.58739131]]
 ```
 &emsp; Timing the idf vector term-wise with each column of the tf matrix would yield the tf-idf matrix.
+```python
+def create_tfidf_mat(term_freq_mat):
+    # Inverse document frequency.
+    # idf(term) = log(movie number) / 1 + (numer of movies containing this term)
+    def calc_idf(term_freq_mat):
+        doc_num = term_freq_mat.shape[1]                    # Number of movies
+        freq = np.count_nonzero(term_freq_mat, axis=1)      # Doc frequency
+
+        # Inverse document frequency
+        idf = np.log(doc_num) / (1 + freq)
+        idf = np.reshape(idf, (len(idf), 1))
+
+        # Filter words that are very common.
+        # I can use nltk, but this is simpler.
+        if __settings__.custom_settings['RM_COMMON_WORDS']:
+            min_idf = np.log(doc_num) / (1 + doc_num)
+            idf[idf == min_idf] = 0
+
+        # Console Log
+        if __settings__.custom_settings['CONSOLE_LOG_PROCESS']:
+            print("\n>>>> Inverse Document Frequency")
+            print(idf)
+        return idf
+
+    # Inverse Document Frequency
+    idf_vector = calc_idf(term_freq_mat)
+    # tf-idf matrix
+    tfidf_mat = term_freq_mat * idf_vector
+    # Console Log
+    if __settings__.custom_settings['CONSOLE_LOG_PROCESS']:
+        print("\n>>>> tf-idf Matrix")
+        print(tfidf_mat)
+    return tfidf_mat, idf_vector
+```
 ```console
 >>>> tf-idf Matrix
            0    1    2    3    4    5    ...  111  112  113  114  115       116
@@ -335,7 +369,7 @@ def get_top_x_names(similarity_scores, top_x, titles):
         top_x_names.append(titles[id])
     return top_x_names
 ```
-The search function takes an input of a search query, and calls the ``cosine_compare()`` function to perform the scoring. Besides printing the result, it also prints the similarity scores. To find the score, we should first find the top x indexes, and then use the index to find the corresponding score. 
+&emsp; The search function takes an input of a search query, and calls the ``cosine_compare()`` function to perform the scoring. Besides printing the result, it also prints the similarity scores. To find the score, we should first find the top x indexes, and then use the index to find the corresponding score. 
 ```python
 def search(search_queries, idf_vector, tfidf_mat, titles, top_x):
     if len(search_queries) > 1:
@@ -373,7 +407,15 @@ def search(search_queries, idf_vector, tfidf_mat, titles, top_x):
                   )
         print("\033[32mSearch is complete!\033[0m")
 ```
-On receiving a ``False`` message, the ``search()`` function prints an error message instead of raises an error.
+On receiving a ``False`` message, the ``search()`` function prints an error message instead of raises an error:
+```python
+    # Scores, in sequence of movies
+    similarity_scores, is_success = cosine_compare(query, idf_vector, tfidf_mat)
+    # Exception: Query size doesn't fit!
+    if not is_success:
+        print("\033[31m$ Warning: Word not exist, try another one.\033[0m\n")
+        return
+```
 
 &emsp; To make a consistent user interface, we uses a while-loop to constantly takes user input:
 ```python
@@ -394,8 +436,38 @@ On receiving a ``False`` message, the ``search()`` function prints an error mess
         query_arr_encap.append(input_query)
         search(query_arr_encap, idf_vector, tfidf_mat, titles, _top_x)  # Perform search
 ```
-This loop will only halt when the user types in the pre-set string ``break()``. Searcher can also list all the movies by typing the ``ls`` command. A shape-unmatch exception caused by an unknown word won't terminate it because it is handled in the ``search()`` function.
+&emsp; This loop will only halt when the user types in the pre-set string ``break()``. Searcher can also list all the movies by typing the ``ls`` command. A shape-unmatch exception caused by an unknown word won't terminate it because it is handled in the ``search()`` function.
+
 ### 5.4. Common Words problem handler.
+&emsp; A problem caused by common word is discovered during project development. A great example is that, the top search result for query "six year old" is:
+
+
+```console
+1.
+ID: 79
+Title: Host
+Sim score: 0.17905439885819746
+```
+while the top search result for query "year old" is:
+```console
+1.
+ID: 69
+Title: Halloween
+Sim score: 0.15211712289647808
+```
+
+&emsp; The problem is that the word "six" has been in the plot twist for "Host" for so many times, so that it contributes more than expected to our search. In fact, even if the idf value of some word is very small (hence they are very common and shouldn't dominate the search result), when the term frequency in one plot twist is large enough, it is still able to contribute to the search result.
+&emsp; Our solution is idf casting. To be frank, it just cuts the word that's existed for a certain amount. For example, if I don't want the word that has existed in more than 50% of the document, I can just assign a 0 to any idf that is equal or below to this value:
+
+
+$$\[\text{{IDF}}(t, D) = \log \left( \frac{{N}}{{\text{{0.5N}}(t, D) + 1}} \right)\]$$
+
+&emsp; This can be performed when calculating idf:
+```python
+    if __settings__.custom_settings['RM_COMMON_WORDS']:
+        min_idf = np.log(doc_num) / (1 + doc_num)
+        idf[idf == min_idf] = 0
+```
 
 &emsp; The old one's still there, take a look:
 
