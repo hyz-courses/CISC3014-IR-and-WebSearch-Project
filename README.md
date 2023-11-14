@@ -7,9 +7,26 @@ It has its own ranking system of movies, with three tiers: Certified Fresh, Fres
 
 
 ## First Crawler ```__get_movies__.py```
-    &emsp; In rottentomatoes.com, the movies collection is presented as a grid view of <div> container. Within each container, there's an <a> tab containing an ```href``` attribute that stores the sub-link to the movie details.
+    &emsp; In rottentomatoes.com, the movies collection is presented as a grid view of <div> container of attribute ```class="flex-container"```. Within each container, there's an <a> tab containing an ```href``` attribute that stores the sub-link to the movie details.
     
-    &emsp; What we've done' is to store 
+    &emsp; Intuitively, we craw the entire list of movies by xpath:
+    
+    ```python
+        movie_list = response.xpath("//div[@class='flex-container']")
+    ```
+    
+    &emsp; Iterate this path. Within each path, we first get the <a> tag, and then retrieve its attributes:
+    
+    ```python
+    score_container = movie.xpath(".//a[@data-track='scores']")score_link = score_container.xpath("@href").get()
+    ``` 
+    
+    &emsp; Lastly, encapsulate this data into a data frame, and store in an excel file.
+    
+    ```python
+                data = {                "title": movie_title,                "stream_time": stream_time,                'link': score_link,                "audience score": aud_score,                "critics score": critics_score,                "audience sentiment": bin_aud_sentiment,                "critics sentiment": bin_critics_sentiment,            }            # Append movie data... not            self.movie_data.append(data)            # Store the data in a new Excel file            self.start_urls.append("https://www.rottentomatoes.com/" + data['link'])            if self.custom_settings['SAVE_DATA']:                __save_data__.save_data_to_excel(data)
+    ```
+    
 ## Second Crawler
 
 
