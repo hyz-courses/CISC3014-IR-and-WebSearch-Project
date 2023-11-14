@@ -7,7 +7,7 @@ It has its own ranking system of movies, with three tiers: Certified Fresh, Fres
 
 
 ## First Crawler ```__get_movies__.py```
-    &emsp; In rottentomatoes.com, the movies collection is presented as a grid view of <div> container of attribute ```class="flex-container"```. Within each container, there's an <a> tab containing an `href` attribute that stores the sub-link to the movie details.
+    &emsp; In rottentomatoes.com, the movies collection is presented as a grid view of <div> container of attribute ```class="flex-container"```. Within each container, there's an <a> tab containing an ``href`` attribute that stores the sub-link to the movie details.
     
     &emsp; Intuitively, we craw the entire list of movies by xpath:
     
