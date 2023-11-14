@@ -24,26 +24,47 @@ score_container = movie.xpath(".//a[@data-track='scores']")score_link = score_c
 &emsp; Lastly, encapsulate this data into a data frame, and store in an excel file.
 
 ```python
-        data = {
-            "title": movie_title,
-            "stream_time": stream_time,
-            'link': score_link,
-            "audience score": aud_score,
-            "critics score": critics_score,
-            "audience sentiment": bin_aud_sentiment,
-            "critics sentiment": bin_critics_sentiment,
-        }
+    data = {
+        "title": movie_title,
+        "stream_time": stream_time,
+        'link': score_link,
+        "audience score": aud_score,
+        "critics score": critics_score,
+        "audience sentiment": bin_aud_sentiment,
+        "critics sentiment": bin_critics_sentiment,
+    }
 
-        # Append movie data... not really useful, cuz i plug it into excel at each loop anyways
-        self.movie_data.append(data)
+    # Append movie data... not really useful, cuz i plug it into excel at each loop anyways
+    self.movie_data.append(data)
 
-        # Store the data in a new Excel file
-        self.start_urls.append("https://www.rottentomatoes.com/" + data['link'])
-        if self.custom_settings['SAVE_DATA']:
-            __save_data__.save_data_to_excel(data)
+    # Store the data in a new Excel file
+    self.start_urls.append("https://www.rottentomatoes.com/" + data['link'])
+    if self.custom_settings['SAVE_DATA']:
+        __save_data__.save_data_to_excel(data)
 ```
 
 ## Second Crawler
+&emsp; Having the url list, we have the second crawler to crawl movie contents of each movie. One movie, with one url, which leads to one movie content, i.e., plots. We wrote a special function to read excel file and form an array of movie urls. These urls are encapsulated into a url array that's ' used as the ``start_urls`` attribute of the second crawler.
+
+```python
+def get_movie_url():
+    # Read Excel file and do analysis
+    file_path = './movie_list/movie_data.xlsx'
+    movie_data = pd.read_excel(file_path)
+    # Get URL
+    url_series = movie_data['link']
+    sub_urls = url_series.values
+
+    # Header URL
+    header_url = 'https://www.rottentomatoes.com'
+    urls = np.array(sub_urls, dtype=object)
+    urls_with_header = header_url + urls
+
+    print(len(urls_with_header))
+    return urls_with_header
+```
+
+&emsp; 
 
 
 &emsp; The old one's still there, take a look:
