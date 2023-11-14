@@ -153,6 +153,74 @@ def get_term_freq(movie_item):
 ```
 
 ### 4.3. Further combine tf vectors into tf matrix.
+&emsp; We would first build the index of the matrix, which is an array of all the word that's ever existed in the queries. This requires to perform a set operation on all the tf vectors.
+
+```python
+def create_vocabulary(path="./movie_list/movie_content.xlsx"):
+    movie_content = xls_to_df(file_path=path)
+
+    # Initialize vocabulary set and term frequency array.
+    vocab = set()
+    term_freqs = []
+    titles = []
+
+    # For ALL movies:
+    for index, row in movie_content.iterrows():
+        tf, title = get_term_freq(row)  # Get its term frequency vector.
+        titles.append(title)            # Merge terms into vocabulary first, and
+        vocab.update(tf.keys())
+        term_freqs.append(tf)           # Store in a unified term frequency matrix.
+    vocab = list(vocab)
+
+    # Console Log
+    if __settings__.custom_settings['CONSOLE_LOG_PROCESS']:
+        print("\n>>>> Vocab")
+        print(vocab)
+
+    return vocab, term_freqs, titles
+```
+
+&emsp; Besides, ``create_vocabulary()`` also preserves the sequence of movie titles, which will be used to match movie by their sequence IDs.
+
+&emsp; Having the index of the matrix, we just insert data into the matrix. For each plot twist, i.e., each tf vector, for each word in the vector, traverse the index until the word is found, then insert it. 
+```python
+def create_tf_mat(path="./movie_list/movie_content.xlsx"):
+    # First, extract vocabulary & term frequency 2D vector.
+    vocab, term_freqs, titles = create_vocabulary(path=path)
+
+    # Initializes term frequency matrix.
+    term_freq_mat = pd.DataFrame(np.zeros((len(vocab), len(term_freqs))), index=vocab)
+
+    # Insert data into the matrix.
+    for index, term_freq in enumerate(term_freqs):
+        for key, value in term_freq.items():
+            term_freq_mat.loc[key, index] = value
+
+    if __settings__.custom_settings['CONSOLE_LOG_PROCESS']:
+        print('\n>>>> Term Frequency Matrix')
+        print(term_freq_mat)
+
+    return term_freq_mat, titles
+```
+
+&emsp; The rows are the frequency vector of each term, and the columns are frequency vector of each term in a specific plot twist.
+
+```console
+>>>> Term Frequency Matrix
+           0    1    2    3    4    5    6    ...  110  111  112  113  114  115  116
+facing     0.0  0.0  0.0  0.0  0.0  0.0  0.0  ...  0.0  0.0  0.0  0.0  0.0  0.0  0.0
+follows    0.0  0.0  0.0  0.0  0.0  1.0  0.0  ...  0.0  0.0  0.0  0.0  0.0  0.0  0.0
+gabi       0.0  0.0  0.0  0.0  0.0  0.0  0.0  ...  0.0  0.0  0.0  0.0  0.0  0.0  0.0
+looks      0.0  0.0  0.0  0.0  0.0  0.0  0.0  ...  0.0  0.0  0.0  0.0  0.0  0.0  0.0
+pass       0.0  0.0  0.0  0.0  0.0  0.0  0.0  ...  0.0  0.0  0.0  0.0  0.0  0.0  0.0
+...        ...  ...  ...  ...  ...  ...  ...  ...  ...  ...  ...  ...  ...  ...  ...
+rebel      0.0  0.0  0.0  0.0  0.0  0.0  0.0  ...  0.0  0.0  0.0  0.0  0.0  0.0  0.0
+wedding    0.0  0.0  0.0  0.0  0.0  0.0  0.0  ...  0.0  0.0  0.0  1.0  0.0  0.0  0.0
+tales      0.0  0.0  0.0  0.0  0.0  0.0  0.0  ...  0.0  0.0  0.0  0.0  0.0  0.0  0.0
+noises     0.0  0.0  0.0  0.0  0.0  0.0  0.0  ...  0.0  0.0  0.0  0.0  0.0  0.0  0.0
+directing  0.0  0.0  0.0  0.0  0.0  0.0  0.0  ...  0.0  0.0  0.0  0.0  0.0  0.0  0.0
+```
+
 ### 4.4. Using tf matrix, calculate inverse document frequency vector, then build tf-idf matrix.
 ## 5. Search & Problems
 

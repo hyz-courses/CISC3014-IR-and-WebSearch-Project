@@ -17,7 +17,7 @@ special_scripts = {
 custom_settings = {
     'RM_COMMON_WORDS': True,
     'TYPE_SEARCH': True,
-    'CONSOLE_LOG_PROCESS': False,
+    'CONSOLE_LOG_PROCESS': True,
     'TOP_X': 5,
 }
 
