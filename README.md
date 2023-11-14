@@ -304,8 +304,16 @@ def cosine_compare(query, idf_vector, tfidf_mat):
 
     return similarity_scores, True
 ```
+It is important to turn query into a tf-idf vector first.
 
 ### 5.2. Exception Handler: Unknown words.
+&emsp; One drawback of the tf-idf model is that it won't recognize any query word that doesn't exist in the index of the tf-idf matrix. Giving a new term in the query will cause an exception that the length of the query tf-idf vector will is longer than the index of the matrix, resulting a shape-unmatch. To prevent python from halting, the exception handler is place as a guardian:
+```python
+        # Error handling: Size doesn't mach
+        if q_tf_vector.shape[0] != idf_vector.shape[0] or q_tf_vector.shape[1] != idf_vector.shape[1]:
+            return q_tf_vector, False
+```
+It basically just detects a shape-unmatch in advance and skip the following code that's meant to be failing.
 ### 5.3. Display Results
 ### 5.4. Common Words problem handler.
 
