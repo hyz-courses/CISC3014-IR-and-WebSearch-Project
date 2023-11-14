@@ -4,9 +4,9 @@
 
 - [1. Introduction to Rotten Tomatoes](#IntroductiontoRottenTomatoes)
 
-- [2. First Crawler `__get_movies__.py`](#FirstCrawler__get_movies__.py)
+- [2. First Crawler](#FirstCrawler__get_movies__.py)
 
-- [3. Second Crawler `__get_movie_detail__.py`](#SecondCrawler__get_movie_detail__.py)
+- [3. Second Crawler](#SecondCrawler__get_movie_detail__.py)
 
 - [4. TF-IDF Model building](#TF-IDFModelbuilding)
 
