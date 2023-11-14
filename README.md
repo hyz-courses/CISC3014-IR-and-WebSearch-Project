@@ -64,7 +64,40 @@ def get_movie_url():
     return urls_with_header
 ```
 
-&emsp; 
+&emsp; The second crawler calls this function to store the urls to be crawled. After this, it calls a ``start_requests()`` function to parse every url with the for-loop contained in it.
+```python
+    def start_requests(self):
+        for url in self.start_urls:
+            headers = {
+                'User-Agent': self.get_random_user_agent()
+            }
+            yield scrapy.Request(url=url, headers=headers, callback=self.parse)
+```
+
+&emsp; The following is quite the same. We retrieve the title & contents of each crawler, and store them into an Excel file. Evidently, each movie corresponds to its own plot twists, in other words, articles. These articles will then be used to build a tf-idf search model.
+```python
+    def parse(self, response):
+        title = response.xpath("//h1[@class='title']/text()").get()
+        genre = response.xpath("//span[@class='genre']/text()").get()
+        genre = re.sub(r'\n|\s|\t', '', genre)
+
+        content = response.xpath("//p[@slot='content']/text()").get()
+        content = re.sub(r'\n|\t', '', content)
+
+        data = {
+            "title": title,
+            "genre": genre,
+            "content": content,
+        }
+
+        # Save data
+        if self.custom_settings['SAVE_DATA']:
+            __save_data__.save_data_to_excel(data, file_name="movie_content")
+
+        print("\n title:" + title)
+        print("\n genre:" + genre)
+        print("\n content:\n" + content)
+```
 
 
 &emsp; The old one's still there, take a look:
