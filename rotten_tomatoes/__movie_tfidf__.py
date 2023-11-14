@@ -248,12 +248,16 @@ def search(search_queries, idf_vector, tfidf_mat, titles, top_x):
 # 2. Bad typo-tolerance: Typo may cause an overflow of array.
 # Solution: Further machine learning techniques....
 
-# Presentation guideline:
+# Presentation (Regular):
+# 1. Type in "ls" to show all movies
+# 2. Type in some common words, like "city", "love", "true love" and "boy".
+# 3. Type in some scripts known in a movie.
+
+# Presentation (Problems):
 # 1. Purposely make a typo, yield an error.
 # 2. Use "theme park" to display the cascading feature.
 # 3. Use "six year old" and "year old" to show the common word's problem.
 # 4. Use "discover how important" to show the sequence problem.
-# 5. Type in some common words, like "city", and "boy".
 
 def main():
     # Term frequency matrix & title array.
@@ -297,6 +301,13 @@ def main():
             if input_query == __settings__.special_scripts['BREAK_WHILE_LOOP']:
                 # A means to halt the while-loop.
                 break
+            if input_query == __settings__.special_scripts['LIST_ALL']:
+                # List all movies
+                for index, title in enumerate(titles):
+                    print("ID: " + str(index+2) + "\n" + "Title: " + title + "\n")
+                continue
+
+            # Search the user input query
             query_arr_encap.append(input_query)
             search(query_arr_encap, idf_vector, tfidf_mat, titles, _top_x)  # Perform search
     else:

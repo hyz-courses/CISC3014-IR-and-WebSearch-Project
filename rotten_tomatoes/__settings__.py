@@ -11,6 +11,7 @@ special_strings = {
 
 special_scripts = {
     'BREAK_WHILE_LOOP': 'break()',
+    'LIST_ALL': 'ls',
 }
 
 custom_settings = {
