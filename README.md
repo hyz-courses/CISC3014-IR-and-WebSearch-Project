@@ -255,7 +255,59 @@ enjoying   0.0  0.0  0.0  0.0  0.0  0.0  ...  0.0  0.0  0.0  0.0  0.0  1.587391
 
 [2898 rows x 117 columns]
 ```
-## 5. Search & Problems
+## 5. Query Search & Problems
+### 5.1. Cosine Similarity
+&emsp; Cosine similarity will be performed to measure the similarity between the query and a specific plot twist, which is a column in the tf-idf matrix. It is given by:
+
+$$\text{cosine\_similarity}(\mathbf{A}, \mathbf{B}) = \frac{\mathbf{A} \cdot \mathbf{B}}{\|\mathbf{A}\| \|\mathbf{B}\|}$$
+
+The cosine similarity geometrically is the cosine value of the angle between two sample vectors in the N-dimensional vector space. Hence the distance (i.e., how long the query or the article is) is not considered. Given a query and a tf-idf matrix, a score indexed by movies is given by this function:
+
+```python
+def cosine_compare(query, idf_vector, tfidf_mat):
+    # Cosine Similarity
+    def cosine(q, d):
+        q = q.T  # Transpose vector to fit the dot op.
+        cos_sim = np.dot(q, d) / (np.linalg.norm(q) * np.linalg.norm(d))
+        return cos_sim.item()
+
+    # Query tf-idf Vector
+    def create_query_tfidf_vector(query, idf_vector):
+        # Tokenizes query into term 2D vector
+        q_term = tokenize(query)
+        q_term_freq = Counter(q_term)  # remove duplicates, make into dictionary
+        q_term_freq = dict(q_term_freq)
+
+        # Query tf vector
+        q_tf_vector = pd.DataFrame(np.zeros((len(idf_vector), 1)), index=tfidf_mat.index)
+        for key, value in q_term_freq.items():
+            q_tf_vector.loc[key] = value
+
+        # Query tfidf vector
+        # Error handling: Size doesn't mach
+        if q_tf_vector.shape[0] != idf_vector.shape[0] or q_tf_vector.shape[1] != idf_vector.shape[1]:
+            return q_tf_vector, False
+        # Size matches
+        q_tfidf_vector = q_tf_vector * idf_vector
+        return q_tfidf_vector, True
+
+    # Compare query tfidf vector with all columns of tfidf_mat
+    q_tfidf_vector, is_success = create_query_tfidf_vector(query, idf_vector)
+    # Error handling: Size don't match
+    if not is_success:
+        return [], False
+    # Size matches, continue.
+    similarity_scores = []
+    for doc in tfidf_mat.columns:
+        doc_vector = tfidf_mat[doc]
+        similarity_scores.append(cosine(q_tfidf_vector, doc_vector))
+
+    return similarity_scores, True
+```
+
+### 5.2. Exception Handler: Unknown words.
+### 5.3. Display Results
+### 5.4. Common Words problem handler.
 
 &emsp; The old one's still there, take a look:
 
