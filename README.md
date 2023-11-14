@@ -24,7 +24,23 @@ It has its own ranking system of movies, with three tiers: Certified Fresh, Fres
     &emsp; Lastly, encapsulate this data into a data frame, and store in an excel file.
     
     ```python
-                data = {                "title": movie_title,                "stream_time": stream_time,                'link': score_link,                "audience score": aud_score,                "critics score": critics_score,                "audience sentiment": bin_aud_sentiment,                "critics sentiment": bin_critics_sentiment,            }            # Append movie data... not            self.movie_data.append(data)            # Store the data in a new Excel file            self.start_urls.append("https://www.rottentomatoes.com/" + data['link'])            if self.custom_settings['SAVE_DATA']:                __save_data__.save_data_to_excel(data)
+            data = {
+                "title": movie_title,
+                "stream_time": stream_time,
+                'link': score_link,
+                "audience score": aud_score,
+                "critics score": critics_score,
+                "audience sentiment": bin_aud_sentiment,
+                "critics sentiment": bin_critics_sentiment,
+            }
+
+            # Append movie data... not really useful, cuz i plug it into excel at each loop anyways
+            self.movie_data.append(data)
+
+            # Store the data in a new Excel file
+            self.start_urls.append("https://www.rottentomatoes.com/" + data['link'])
+            if self.custom_settings['SAVE_DATA']:
+                __save_data__.save_data_to_excel(data)
     ```
     
 ## Second Crawler
