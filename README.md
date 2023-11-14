@@ -2,19 +2,23 @@
 
 <!-- vscode-markdown-toc -->
 
-- 1. [1. Introduction to Rotten Tomatoes](#IntroductiontoRottenTomatoes)
-- 2. [2. First Crawler `__get_movies__.py`](#FirstCrawler__get_movies__.py)
-- 3. [3. Second Crawler `__get_movie_detail__.py`](#SecondCrawler__get_movie_detail__.py)
-- 4. [4. TF-IDF Model building](#TF-IDFModelbuilding)
-  - 4.1. [4.1. Tokenize each article into an array.](#Tokenizeeacharticleintoanarray.)
-  - 4.2. [4.2. For each array, remove duplicates and form a term-frequency vector.](#Foreacharrayremoveduplicatesandformaterm-frequencyvector.)
-  - 4.3. [4.3. Further combine tf vectors into tf matrix.](#Furthercombinetfvectorsintotfmatrix.)
-  - 4.4. [4.4. Using tf matrix, calculate inverse document frequency vector, then build tf-idf matrix.](#Usingtfmatrixcalculateinversedocumentfrequencyvectorthenbuildtf-idfmatrix.)
-- 5. [5. Query Search & Problems](#QuerySearchProblems)
-  - 5.1. [5.1. Cosine Similarity](#CosineSimilarity)
-  - 5.2. [5.2. Exception Handler: Unknown words.](#ExceptionHandler:Unknownwords.)
-  - 5.3. [5.3. Display Results](#DisplayResults)
-  - 5.4. [5.4. Problem Handler: Common Words Problem.](#ProblemHandler:CommonWordsProblem.)
+[1. Introduction to Rotten Tomatoes](#IntroductiontoRottenTomatoes)
+[2. First Crawler `__get_movies__.py`](#FirstCrawler__get_movies__.py)
+[3. Second Crawler `__get_movie_detail__.py`](#SecondCrawler__get_movie_detail__.py)
+[4. TF-IDF Model building](#TF-IDFModelbuilding)
+
+- [4.1. Tokenize each article into an array.](#Tokenizeeacharticleintoanarray.)
+- [4.2. For each array, remove duplicates and form a term-frequency vector.](#Foreacharrayremoveduplicatesandformaterm-frequencyvector.)
+- [4.3. Further combine tf vectors into tf matrix.](#Furthercombinetfvectorsintotfmatrix.)
+- [4.4. Using tf matrix, calculate inverse document frequency vector, then build tf-idf matrix.](#Usingtfmatrixcalculateinversedocumentfrequencyvectorthenbuildtf-idfmatrix.)
+
+[5. Query Search & Problems](#QuerySearchProblems)
+
+- [5.1. Cosine Similarity](#CosineSimilarity)
+- [5.2. Exception Handler: Unknown words.](#ExceptionHandler:Unknownwords.)
+- [5.3. Display Results](#DisplayResults)
+- [5.4. Problem Handler: Common Words Problem.](#ProblemHandler:CommonWordsProblem.)
+- [5.5. An example of a common search result.](#an-example-of-a-common-search-result)
 
 <!-- vscode-markdown-toc-config
 	numbering=true
@@ -22,13 +26,13 @@
 	/vscode-markdown-toc-config -->
 <!-- /vscode-markdown-toc -->
 
-## 1. <a name='IntroductiontoRottenTomatoes'></a>1. Introduction to Rotten Tomatoes
+# <a name='IntroductiontoRottenTomatoes'></a>1. Introduction to Rotten Tomatoes
 
 ![Image](/screenshots/rotten_tomatoes.png)
 &emsp; Rotten Tomatoes is a review-aggregation website for film and television in the U.S.
 It has its own ranking system of movies, with three tiers: Certified Fresh, Fresh, and Rotten. The goal of our project is to extract the main content of top 100+ list from RT, then make a query searcher based on the plot twists using TF-IDF model.
 
-## 2. <a name='FirstCrawler__get_movies__.py'></a>2. First Crawler `__get_movies__.py`
+# <a name='FirstCrawler__get_movies__.py'></a>2. First Crawler `__get_movies__.py`
 
 &emsp; In rottentomatoes.com, the movies collection is presented as a grid view of `<div>` container of attribute `class="flex-container"`. Within each container, there's an `<a>` tab containing an `href` attribute that stores the sub-link to the movie details.
 
@@ -71,7 +75,7 @@ score_container = movie.xpath(".//a[@data-track='scores']")score_link = score_c
 &emsp; The excel file is `movie_data.xls`:
 ![Image](/screenshots/movie_data.png)
 
-## 3. <a name='SecondCrawler__get_movie_detail__.py'></a>3. Second Crawler `__get_movie_detail__.py`
+# <a name='SecondCrawler__get_movie_detail__.py'></a>3. Second Crawler `__get_movie_detail__.py`
 
 &emsp; Having the url list, we have the second crawler to crawl movie contents of each movie. One movie, with one url, which leads to one movie content, i.e., plots. We wrote a special function to read excel file and form an array of movie urls. These urls are encapsulated into a url array that's ' used as the `start_urls` attribute of the second crawler.
 
@@ -136,9 +140,9 @@ def get_movie_url():
         print("\n content:\n" + content)
 ```
 
-## 4. <a name='TF-IDFModelbuilding'></a>4. TF-IDF Model building
+# <a name='TF-IDFModelbuilding'></a>4. TF-IDF Model building
 
-### 4.1. <a name='Tokenizeeacharticleintoanarray.'></a>4.1. Tokenize each article into an array.
+## <a name='Tokenizeeacharticleintoanarray.'></a>4.1. Tokenize each article into an array.
 
 ```python
 def tokenize(input_str):
@@ -162,7 +166,7 @@ def tokenize(input_str):
     return terms
 ```
 
-### 4.2. <a name='Foreacharrayremoveduplicatesandformaterm-frequencyvector.'></a>4.2. For each array, remove duplicates and form a term-frequency vector.
+## <a name='Foreacharrayremoveduplicatesandformaterm-frequencyvector.'></a>4.2. For each array, remove duplicates and form a term-frequency vector.
 
 &emsp; The main part is the `Counter()` function, which counts duplicates and merge them together. For example, the query `["the", "cake", "tastes", "like", "cake"]` would be merged as `{"the":1, "cake":2, "tastes":1, "like":1}`.
 
@@ -188,7 +192,7 @@ def get_term_freq(movie_item):
     return movie_tf, title
 ```
 
-### 4.3. <a name='Furthercombinetfvectorsintotfmatrix.'></a>4.3. Further combine tf vectors into tf matrix.
+## <a name='Furthercombinetfvectorsintotfmatrix.'></a>4.3. Further combine tf vectors into tf matrix.
 
 &emsp; We would first build the index of the matrix, which is an array of all the word that's ever existed in the queries. This requires to perform a set operation on all the tf vectors.
 
@@ -259,7 +263,7 @@ sappy      0.0  0.0  0.0  0.0  0.0  0.0  0.0  ...  0.0  0.0  0.0  0.0  0.0  0.0 
 enjoying   0.0  0.0  0.0  0.0  0.0  0.0  0.0  ...  0.0  0.0  0.0  0.0  0.0  0.0  1.0
 ```
 
-### 4.4. <a name='Usingtfmatrixcalculateinversedocumentfrequencyvectorthenbuildtf-idfmatrix.'></a>4.4. Using tf matrix, calculate inverse document frequency vector, then build tf-idf matrix.
+## <a name='Usingtfmatrixcalculateinversedocumentfrequencyvectorthenbuildtf-idfmatrix.'></a>4.4. Using tf matrix, calculate inverse document frequency vector, then build tf-idf matrix.
 
 &emsp; Inverse document frequency can be retrieved by:
 
@@ -333,9 +337,9 @@ enjoying   0.0  0.0  0.0  0.0  0.0  0.0  ...  0.0  0.0  0.0  0.0  0.0  1.587391
 [2898 rows x 117 columns]
 ```
 
-## 5. <a name='QuerySearchProblems'></a>5. Query Search & Problems
+# <a name='QuerySearchProblems'></a>5. Query Search & Problems
 
-### 5.1. <a name='CosineSimilarity'></a>5.1. Cosine Similarity
+## <a name='CosineSimilarity'></a>5.1. Cosine Similarity
 
 &emsp; Cosine similarity will be performed to measure the similarity between the query and a specific plot twist, which is a column in the tf-idf matrix. It is given by:
 
@@ -387,7 +391,7 @@ def cosine_compare(query, idf_vector, tfidf_mat):
 
 It is important to turn query into a tf-idf vector first.
 
-### 5.2. <a name='ExceptionHandler:Unknownwords.'></a>5.2. Exception Handler: Unknown words.
+## <a name='ExceptionHandler:Unknownwords.'></a>5.2. Exception Handler: Unknown words.
 
 &emsp; One drawback of the tf-idf model is that it won't recognize any query word that doesn't exist in the index of the tf-idf matrix. Giving a new term in the query will cause an exception that the length of the query tf-idf vector will become longer than the index of the matrix, resulting a shape-unmatch. To prevent python from halting, the exception handler is place as a guardian:
 
@@ -399,7 +403,7 @@ It is important to turn query into a tf-idf vector first.
 
 It basically just detects a shape-unmatch in advance and skip the following code that's meant to be failing. Once a failure is detected, a `False` value will be returned.
 
-### 5.3. <a name='DisplayResults'></a>5.3. Display Results
+## <a name='DisplayResults'></a>5.3. Display Results
 
 &emsp; The key of displaying results is to sort the score array while still preserving its index. The index is an integer pointing to the `titles` array that stores the movie titles. This function will return the indexes (not values) of the top x scored movies.
 
@@ -497,7 +501,7 @@ On receiving a `False` message, the `search()` function prints an error message 
 
 &emsp; This loop will only halt when the user types in the pre-set string `break()`. Searcher can also list all the movies by typing the `ls` command. A shape-unmatch exception caused by an unknown word won't terminate it because it is handled in the `search()` function.
 
-### 5.4. <a name='ProblemHandler:CommonWordsProblem.'></a>5.4. Problem Handler: Common Words Problem.
+## <a name='ProblemHandler:CommonWordsProblem.'></a>5.4. Problem Handler: Common Words Problem.
 
 &emsp; A problem caused by common word is discovered during project development. A great example is that, the top search result for query "six year old" is:
 
@@ -531,3 +535,32 @@ $$\[\text{{IDF}}(t, D) = \log \left( \frac{{N}}{{\text{{0.5N}} + 1}} \right)\]$$
 ```
 
 &emsp; This allows us to prevent any word that's to some extent too common among plot twists from contributing to the search result.
+
+## An example of a common search result:
+
+```python
+>> What do you want to search? year old
+Searched for: "year old"
+Top 5 relevant:
+1.
+ID: 69
+Title: Halloween
+Sim score: 0.15211712289647808
+2.
+ID: 45
+Title: Cuties
+Sim score: 0.10380713227139456
+3.
+ID: 10
+Title: Totally Killer
+Sim score: 0.0679638359039251
+4.
+ID: 44
+Title: Dark Harvest
+Sim score: 0.05955330512572505
+5.
+ID: 60
+Title: Hocus Pocus
+Sim score: 0.053317720342773836
+Search is complete!
+```
