@@ -2,7 +2,7 @@
 
 
 ## Rotten Tomatoes
-$emsp; Rotten Tomatoes is a review-aggregation website for film and television in the U.S. 
+&emsp; Rotten Tomatoes is a review-aggregation website for film and television in the U.S. 
 It has its own ranking system of movies, with three tiers: Certified Fresh, Fresh, and Rotten. The goal of our project is to extract the main content of top 100+ list from RT, then make a query searcher based on the plot twists using TF-IDF model.
 
 
