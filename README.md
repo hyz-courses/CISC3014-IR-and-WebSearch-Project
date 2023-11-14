@@ -2,12 +2,15 @@
 
 
 ## 1. Introduction to Rotten Tomatoes
+![Image](/screenshots/rotten_tomatoes.png)
 &emsp; Rotten Tomatoes is a review-aggregation website for film and television in the U.S. 
 It has its own ranking system of movies, with three tiers: Certified Fresh, Fresh, and Rotten. The goal of our project is to extract the main content of top 100+ list from RT, then make a query searcher based on the plot twists using TF-IDF model.
 
 
 ## 2. First Crawler ```__get_movies__.py```
 &emsp; In rottentomatoes.com, the movies collection is presented as a grid view of ``<div>`` container of attribute ``class="flex-container"``. Within each container, there's an ``<a>`` tab containing an ``href`` attribute that stores the sub-link to the movie details.
+
+![Image](/screenshots/rotten_tomatoes_top_movies.png)
 
 &emsp; Intuitively, we craw the entire list of movies by xpath:
 
@@ -476,4 +479,4 @@ $$\[\text{{IDF}}(t, D) = \log \left( \frac{{N}}{{\text{{0.5N}}(t, D) + 1}} \righ
 It would scrape 10 important indecies from Xueqiu.
 
 &emsp; ```get_stock.py``` is the main file.
-![Image](/screenshots/scr1.png)
+
