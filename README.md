@@ -1,14 +1,36 @@
-# CISC3014-IR-and-WebSearch-Project
+# Plot Search using TF-IDF Model
 
+<!-- vscode-markdown-toc -->
 
-## 1. Introduction to Rotten Tomatoes
+- 1. [1. Introduction to Rotten Tomatoes](#IntroductiontoRottenTomatoes)
+- 2. [2. First Crawler `__get_movies__.py`](#FirstCrawler__get_movies__.py)
+- 3. [3. Second Crawler `__get_movie_detail__.py`](#SecondCrawler__get_movie_detail__.py)
+- 4. [4. TF-IDF Model building](#TF-IDFModelbuilding)
+  - 4.1. [4.1. Tokenize each article into an array.](#Tokenizeeacharticleintoanarray.)
+  - 4.2. [4.2. For each array, remove duplicates and form a term-frequency vector.](#Foreacharrayremoveduplicatesandformaterm-frequencyvector.)
+  - 4.3. [4.3. Further combine tf vectors into tf matrix.](#Furthercombinetfvectorsintotfmatrix.)
+  - 4.4. [4.4. Using tf matrix, calculate inverse document frequency vector, then build tf-idf matrix.](#Usingtfmatrixcalculateinversedocumentfrequencyvectorthenbuildtf-idfmatrix.)
+- 5. [5. Query Search & Problems](#QuerySearchProblems)
+  - 5.1. [5.1. Cosine Similarity](#CosineSimilarity)
+  - 5.2. [5.2. Exception Handler: Unknown words.](#ExceptionHandler:Unknownwords.)
+  - 5.3. [5.3. Display Results](#DisplayResults)
+  - 5.4. [5.4. Problem Handler: Common Words Problem.](#ProblemHandler:CommonWordsProblem.)
+
+<!-- vscode-markdown-toc-config
+	numbering=true
+	autoSave=true
+	/vscode-markdown-toc-config -->
+<!-- /vscode-markdown-toc -->
+
+## 1. <a name='IntroductiontoRottenTomatoes'></a>1. Introduction to Rotten Tomatoes
+
 ![Image](/screenshots/rotten_tomatoes.png)
-&emsp; Rotten Tomatoes is a review-aggregation website for film and television in the U.S. 
+&emsp; Rotten Tomatoes is a review-aggregation website for film and television in the U.S.
 It has its own ranking system of movies, with three tiers: Certified Fresh, Fresh, and Rotten. The goal of our project is to extract the main content of top 100+ list from RT, then make a query searcher based on the plot twists using TF-IDF model.
 
+## 2. <a name='FirstCrawler__get_movies__.py'></a>2. First Crawler `__get_movies__.py`
 
-## 2. First Crawler ```__get_movies__.py```
-&emsp; In rottentomatoes.com, the movies collection is presented as a grid view of ``<div>`` container of attribute ``class="flex-container"``. Within each container, there's an ``<a>`` tab containing an ``href`` attribute that stores the sub-link to the movie details.
+&emsp; In rottentomatoes.com, the movies collection is presented as a grid view of `<div>` container of attribute `class="flex-container"`. Within each container, there's an `<a>` tab containing an `href` attribute that stores the sub-link to the movie details.
 
 ![Image](/screenshots/rotten_tomatoes_top_movies.png)
 
@@ -22,7 +44,7 @@ It has its own ranking system of movies, with three tiers: Certified Fresh, Fres
 
 ```python
 score_container = movie.xpath(".//a[@data-track='scores']")score_link = score_container.xpath("@href").get()
-``` 
+```
 
 &emsp; Lastly, encapsulate this data into a data frame, and store in an excel file.
 
@@ -45,11 +67,13 @@ score_container = movie.xpath(".//a[@data-track='scores']")score_link = score_c
     if self.custom_settings['SAVE_DATA']:
         __save_data__.save_data_to_excel(data)
 ```
-&emsp; The excel file is ``movie_data.xls``:
+
+&emsp; The excel file is `movie_data.xls`:
 ![Image](/screenshots/movie_data.png)
 
-## 3. Second Crawler ```__get_movie_detail__.py```
-&emsp; Having the url list, we have the second crawler to crawl movie contents of each movie. One movie, with one url, which leads to one movie content, i.e., plots. We wrote a special function to read excel file and form an array of movie urls. These urls are encapsulated into a url array that's ' used as the ``start_urls`` attribute of the second crawler.
+## 3. <a name='SecondCrawler__get_movie_detail__.py'></a>3. Second Crawler `__get_movie_detail__.py`
+
+&emsp; Having the url list, we have the second crawler to crawl movie contents of each movie. One movie, with one url, which leads to one movie content, i.e., plots. We wrote a special function to read excel file and form an array of movie urls. These urls are encapsulated into a url array that's ' used as the `start_urls` attribute of the second crawler.
 
 ```python
 def get_movie_url():
@@ -69,7 +93,8 @@ def get_movie_url():
     return urls_with_header
 ```
 
-&emsp; The second crawler calls this function to store the urls to be crawled. After this, it calls a ``start_requests()`` function to parse every url with the for-loop contained in it.
+&emsp; The second crawler calls this function to store the urls to be crawled. After this, it calls a `start_requests()` function to parse every url with the for-loop contained in it.
+
 ```python
     def start_requests(self):
         for url in self.start_urls:
@@ -78,9 +103,10 @@ def get_movie_url():
             }
             yield scrapy.Request(url=url, headers=headers, callback=self.parse)
 ```
+
 ![Image](/screenshots/rotten_tomatoes_detail.png)
 
-&emsp; The following is quite the same. The plot twist is stored in a ``<p>`` element with parameter ``slot="content"``. We retrieve the title & contents of each crawler, and store them into an Excel file. Before storing each plot twist, we remove all the return and tab characters. The excel file is named ``movie_content.xls``:
+&emsp; The following is quite the same. The plot twist is stored in a `<p>` element with parameter `slot="content"`. We retrieve the title & contents of each crawler, and store them into an Excel file. Before storing each plot twist, we remove all the return and tab characters. The excel file is named `movie_content.xls`:
 
 ![Image](/screenshots/movie_content.png)
 
@@ -110,8 +136,9 @@ def get_movie_url():
         print("\n content:\n" + content)
 ```
 
-## 4. TF-IDF Model building
-### 4.1. Tokenize each article into an array.
+## 4. <a name='TF-IDFModelbuilding'></a>4. TF-IDF Model building
+
+### 4.1. <a name='Tokenizeeacharticleintoanarray.'></a>4.1. Tokenize each article into an array.
 
 ```python
 def tokenize(input_str):
@@ -135,8 +162,9 @@ def tokenize(input_str):
     return terms
 ```
 
-### 4.2. For each array, remove duplicates and form a term-frequency vector.
-&emsp; The main part is the ``Counter()`` function, which counts duplicates and merge them together. For example, the query ``["the", "cake", "tastes", "like", "cake"]`` would be merged as ``{"the":1, "cake":2, "tastes":1, "like":1}``.
+### 4.2. <a name='Foreacharrayremoveduplicatesandformaterm-frequencyvector.'></a>4.2. For each array, remove duplicates and form a term-frequency vector.
+
+&emsp; The main part is the `Counter()` function, which counts duplicates and merge them together. For example, the query `["the", "cake", "tastes", "like", "cake"]` would be merged as `{"the":1, "cake":2, "tastes":1, "like":1}`.
 
 ```python
 def get_term_freq(movie_item):
@@ -160,7 +188,8 @@ def get_term_freq(movie_item):
     return movie_tf, title
 ```
 
-### 4.3. Further combine tf vectors into tf matrix.
+### 4.3. <a name='Furthercombinetfvectorsintotfmatrix.'></a>4.3. Further combine tf vectors into tf matrix.
+
 &emsp; We would first build the index of the matrix, which is an array of all the word that's ever existed in the queries. This requires to perform a set operation on all the tf vectors.
 
 ```python
@@ -188,9 +217,10 @@ def create_vocabulary(path="./movie_list/movie_content.xlsx"):
     return vocab, term_freqs, titles
 ```
 
-&emsp; Besides, ``create_vocabulary()`` also preserves the sequence of movie titles, which will be used to match movie by their sequence IDs.
+&emsp; Besides, `create_vocabulary()` also preserves the sequence of movie titles, which will be used to match movie by their sequence IDs.
 
-&emsp; Having the index of the matrix, we just insert data into the matrix. For each plot twist, i.e., each tf vector, for each word in the vector, traverse the index until the word is found, then insert it. 
+&emsp; Having the index of the matrix, we just insert data into the matrix. For each plot twist, i.e., each tf vector, for each word in the vector, traverse the index until the word is found, then insert it.
+
 ```python
 def create_tf_mat(path="./movie_list/movie_content.xlsx"):
     # First, extract vocabulary & term frequency 2D vector.
@@ -229,12 +259,14 @@ sappy      0.0  0.0  0.0  0.0  0.0  0.0  0.0  ...  0.0  0.0  0.0  0.0  0.0  0.0 
 enjoying   0.0  0.0  0.0  0.0  0.0  0.0  0.0  ...  0.0  0.0  0.0  0.0  0.0  0.0  1.0
 ```
 
-### 4.4. Using tf matrix, calculate inverse document frequency vector, then build tf-idf matrix.
+### 4.4. <a name='Usingtfmatrixcalculateinversedocumentfrequencyvectorthenbuildtf-idfmatrix.'></a>4.4. Using tf matrix, calculate inverse document frequency vector, then build tf-idf matrix.
+
 &emsp; Inverse document frequency can be retrieved by:
 
 $$\[\text{{IDF}}(t, D) = \log \left( \frac{{N}}{{\text{{df}}(t, D) + 1}} \right)\]$$
 
 which yields to be:
+
 ```console
 >>>> Inverse Document Frequency
 [[2.38108697]
@@ -245,7 +277,9 @@ which yields to be:
  [2.38108697]
  [1.58739131]]
 ```
+
 &emsp; Timing the idf vector term-wise with each column of the tf matrix would yield the tf-idf matrix.
+
 ```python
 def create_tfidf_mat(term_freq_mat):
     # Inverse document frequency.
@@ -280,6 +314,7 @@ def create_tfidf_mat(term_freq_mat):
         print(tfidf_mat)
     return tfidf_mat, idf_vector
 ```
+
 ```console
 >>>> tf-idf Matrix
            0    1    2    3    4    5    ...  111  112  113  114  115       116
@@ -297,8 +332,11 @@ enjoying   0.0  0.0  0.0  0.0  0.0  0.0  ...  0.0  0.0  0.0  0.0  0.0  1.587391
 
 [2898 rows x 117 columns]
 ```
-## 5. Query Search & Problems
-### 5.1. Cosine Similarity
+
+## 5. <a name='QuerySearchProblems'></a>5. Query Search & Problems
+
+### 5.1. <a name='CosineSimilarity'></a>5.1. Cosine Similarity
+
 &emsp; Cosine similarity will be performed to measure the similarity between the query and a specific plot twist, which is a column in the tf-idf matrix. It is given by:
 
 $$\text{cosine}(\mathbf{q}, \mathbf{d}) = \frac{\mathbf{q} \cdot \mathbf{d}^T}{\|\mathbf{q}\| \|\mathbf{d}\|}$$
@@ -346,9 +384,11 @@ def cosine_compare(query, idf_vector, tfidf_mat):
 
     return similarity_scores, True
 ```
+
 It is important to turn query into a tf-idf vector first.
 
-### 5.2. Exception Handler: Unknown words.
+### 5.2. <a name='ExceptionHandler:Unknownwords.'></a>5.2. Exception Handler: Unknown words.
+
 &emsp; One drawback of the tf-idf model is that it won't recognize any query word that doesn't exist in the index of the tf-idf matrix. Giving a new term in the query will cause an exception that the length of the query tf-idf vector will become longer than the index of the matrix, resulting a shape-unmatch. To prevent python from halting, the exception handler is place as a guardian:
 
 ```python
@@ -357,9 +397,12 @@ It is important to turn query into a tf-idf vector first.
         return q_tf_vector, False
 ```
 
-It basically just detects a shape-unmatch in advance and skip the following code that's meant to be failing. Once a failure is detected, a ``False`` value will be returned.
-### 5.3. Display Results
-&emsp; The key of displaying results is to sort the score array while still preserving its index. The index is an integer pointing to the ``titles`` array that stores the movie titles. This function will return the indexes (not values) of the top x scored movies.
+It basically just detects a shape-unmatch in advance and skip the following code that's meant to be failing. Once a failure is detected, a `False` value will be returned.
+
+### 5.3. <a name='DisplayResults'></a>5.3. Display Results
+
+&emsp; The key of displaying results is to sort the score array while still preserving its index. The index is an integer pointing to the `titles` array that stores the movie titles. This function will return the indexes (not values) of the top x scored movies.
+
 ```python
 def get_top_x_id(similarity_scores, top_x):
     # Fetch top x most relevant.
@@ -368,7 +411,9 @@ def get_top_x_id(similarity_scores, top_x):
     top_x_id = sorted_similarity_scores[:top_x]
     return top_x_id
 ```
+
 Having the indexes, it can't be easier to find the movie titles:
+
 ```python
 def get_top_x_names(similarity_scores, top_x, titles):
     top_x_id = get_top_x_id(similarity_scores, top_x)
@@ -377,7 +422,9 @@ def get_top_x_names(similarity_scores, top_x, titles):
         top_x_names.append(titles[id])
     return top_x_names
 ```
-&emsp; The search function takes an input of a search query, and calls the ``cosine_compare()`` function to perform the scoring. Besides printing the result, it also prints the similarity scores. To find the score, we should first find the top x indexes, and then use the index to find the corresponding score. 
+
+&emsp; The search function takes an input of a search query, and calls the `cosine_compare()` function to perform the scoring. Besides printing the result, it also prints the similarity scores. To find the score, we should first find the top x indexes, and then use the index to find the corresponding score.
+
 ```python
 def search(search_queries, idf_vector, tfidf_mat, titles, top_x):
     if len(search_queries) > 1:
@@ -415,7 +462,9 @@ def search(search_queries, idf_vector, tfidf_mat, titles, top_x):
                   )
         print("\033[32mSearch is complete!\033[0m")
 ```
-On receiving a ``False`` message, the ``search()`` function prints an error message instead of raises an error:
+
+On receiving a `False` message, the `search()` function prints an error message instead of raises an error:
+
 ```python
     # Scores, in sequence of movies
     similarity_scores, is_success = cosine_compare(query, idf_vector, tfidf_mat)
@@ -426,6 +475,7 @@ On receiving a ``False`` message, the ``search()`` function prints an error mess
 ```
 
 &emsp; To make a consistent user interface, we uses a while-loop to constantly takes user input:
+
 ```python
     while True:
         query_arr_encap = []
@@ -444,11 +494,12 @@ On receiving a ``False`` message, the ``search()`` function prints an error mess
         query_arr_encap.append(input_query)
         search(query_arr_encap, idf_vector, tfidf_mat, titles, _top_x)  # Perform search
 ```
-&emsp; This loop will only halt when the user types in the pre-set string ``break()``. Searcher can also list all the movies by typing the ``ls`` command. A shape-unmatch exception caused by an unknown word won't terminate it because it is handled in the ``search()`` function.
 
-### 5.4. Problem Handler: Common Words Problem.
+&emsp; This loop will only halt when the user types in the pre-set string `break()`. Searcher can also list all the movies by typing the `ls` command. A shape-unmatch exception caused by an unknown word won't terminate it because it is handled in the `search()` function.
+
+### 5.4. <a name='ProblemHandler:CommonWordsProblem.'></a>5.4. Problem Handler: Common Words Problem.
+
 &emsp; A problem caused by common word is discovered during project development. A great example is that, the top search result for query "six year old" is:
-
 
 ```console
 1.
@@ -456,7 +507,9 @@ ID: 79
 Title: Host
 Sim score: 0.17905439885819746
 ```
+
 while the top search result for query "year old" is:
+
 ```console
 1.
 ID: 69
@@ -467,10 +520,10 @@ Sim score: 0.15211712289647808
 &emsp; The problem is that the word "six" has been in the plot twist for "Host" for so many times, so that it contributes more than expected to our search. In fact, even if the idf value of some word is very small (hence they are very common and shouldn't dominate the search result), when the term frequency in one plot twist is large enough, it is still able to contribute to the search result.
 &emsp; Our solution is idf casting. To be frank, it just cuts the word that's existed for a certain amount. For example, if I don't want the word that has existed in more than 50% of the document, I can just assign a 0 to any idf that is equal or below to this value:
 
-
 $$\[\text{{IDF}}(t, D) = \log \left( \frac{{N}}{{\text{{0.5N}} + 1}} \right)\]$$
 
 &emsp; This can be performed when calculating idf:
+
 ```python
     if __settings__.custom_settings['RM_COMMON_WORDS']:
         min_idf = np.log(doc_num) / (1 + doc_num)
