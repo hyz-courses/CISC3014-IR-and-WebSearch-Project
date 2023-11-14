@@ -76,7 +76,7 @@ def get_movie_url():
             }
             yield scrapy.Request(url=url, headers=headers, callback=self.parse)
 ```
-![Image](/screenshots/rotten_tomatoes_top_movies.png)
+![Image](/screenshots/rotten_tomatoes_detail.png)
 
 &emsp; The following is quite the same. The plot twist is stored in a ``<p>`` element with parameter ``slot="content"``. We retrieve the title & contents of each crawler, and store them into an Excel file. Before storing each plot twist, we remove all the return and tab characters. 
 
