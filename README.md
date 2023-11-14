@@ -1,12 +1,12 @@
 # CISC3014-IR-and-WebSearch-Project
 
 
-## Rotten Tomatoes
+## 1. Introduction to Rotten Tomatoes
 &emsp; Rotten Tomatoes is a review-aggregation website for film and television in the U.S. 
 It has its own ranking system of movies, with three tiers: Certified Fresh, Fresh, and Rotten. The goal of our project is to extract the main content of top 100+ list from RT, then make a query searcher based on the plot twists using TF-IDF model.
 
 
-## First Crawler ```__get_movies__.py```
+## 2. First Crawler ```__get_movies__.py```
 &emsp; In rottentomatoes.com, the movies collection is presented as a grid view of ``<div>`` container of attribute ``class="flex-container"``. Within each container, there's an ``<a>`` tab containing an ``href`` attribute that stores the sub-link to the movie details.
 
 &emsp; Intuitively, we craw the entire list of movies by xpath:
@@ -43,7 +43,7 @@ score_container = movie.xpath(".//a[@data-track='scores']")score_link = score_c
         __save_data__.save_data_to_excel(data)
 ```
 
-## Second Crawler
+## 3. Second Crawler ```__get_movie_detail__.py```
 &emsp; Having the url list, we have the second crawler to crawl movie contents of each movie. One movie, with one url, which leads to one movie content, i.e., plots. We wrote a special function to read excel file and form an array of movie urls. These urls are encapsulated into a url array that's ' used as the ``start_urls`` attribute of the second crawler.
 
 ```python
@@ -74,7 +74,10 @@ def get_movie_url():
             yield scrapy.Request(url=url, headers=headers, callback=self.parse)
 ```
 
-&emsp; The following is quite the same. We retrieve the title & contents of each crawler, and store them into an Excel file. Evidently, each movie corresponds to its own plot twists, in other words, articles. These articles will then be used to build a tf-idf search model.
+&emsp; The following is quite the same. We retrieve the title & contents of each crawler, and store them into an Excel file. Before storing each plot twist, we remove all the return and tab characters. 
+
+&emsp; Evidently, each movie corresponds to its own plot twists, in other words, articles. These articles will then be used to build a tf-idf search model.
+
 ```python
     def parse(self, response):
         title = response.xpath("//h1[@class='title']/text()").get()
@@ -99,6 +102,58 @@ def get_movie_url():
         print("\n content:\n" + content)
 ```
 
+## 4. TF-IDF Model building
+### 4.1. Tokenize each article into an array.
+
+```python
+def tokenize(input_str):
+    # Define the splitting delimiters using regular expression
+    rule = r'[\s\~\`\!\@\#\$\%\^\&\*\(\)\-\_\+\=\{\}\[\]\;\:\'\"\,\<\.\>\/\?\\|]+'
+    re.compile(rule)
+
+    # Turn all letters in the string into lowercase
+    # This may contain empty member ''
+    terms_ = []
+    terms_ = terms_ + re.split(rule, input_str.lower())
+
+    # Remove the empty member ''
+    terms = []
+    for term in terms_:
+        if term != '':
+            terms.append(term)
+
+    last_word = terms[-1]
+    # print("last_word: " + last_word)
+    return terms
+```
+
+### 4.2. For each array, remove duplicates and form a term-frequency vector.
+
+```python
+def get_term_freq(movie_item):
+    title = movie_item['title']
+    content = movie_item['content']
+
+    # Split content article into word array.
+    term_array = tokenize(content)
+
+    # Using word array, count term frequency.
+    # Term frequency: term:key -> frequency:value
+    movie_tf = Counter(term_array)
+    movie_tf = dict(movie_tf)
+
+    # Console logs
+    if __settings__.custom_settings['CONSOLE_LOG_PROCESS']:
+        print("\n>> " + title)
+        # print(term_array)
+        print(movie_tf)
+
+    return movie_tf, title
+```
+
+### 4.3. Further combine tf vectors into tf matrix.
+### 4.4. Using tf matrix, calculate inverse document frequency vector, then build tf-idf matrix.
+## 5. Search & Problems
 
 &emsp; The old one's still there, take a look:
 
