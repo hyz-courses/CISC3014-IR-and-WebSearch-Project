@@ -446,7 +446,7 @@ On receiving a ``False`` message, the ``search()`` function prints an error mess
 ```
 &emsp; This loop will only halt when the user types in the pre-set string ``break()``. Searcher can also list all the movies by typing the ``ls`` command. A shape-unmatch exception caused by an unknown word won't terminate it because it is handled in the ``search()`` function.
 
-### 5.4. Common Words problem handler.
+### 5.4. Problem Handler: Common Words Problem.
 &emsp; A problem caused by common word is discovered during project development. A great example is that, the top search result for query "six year old" is:
 
 
