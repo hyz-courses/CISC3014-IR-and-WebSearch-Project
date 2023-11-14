@@ -224,7 +224,9 @@ directing  0.0  0.0  0.0  0.0  0.0  0.0  0.0  ...  0.0  0.0  0.0  0.0  0.0  0.0 
 ### 4.4. Using tf matrix, calculate inverse document frequency vector, then build tf-idf matrix.
 &emsp; Inverse document frequency can be retrieved by:
 
+```latex
 \[\text{{IDF}}(t, D) = \log \left( \frac{{N}}{{\text{{df}}(t, D) + 1}} \right)\]
+```
 
 which yields to be:
 ```console
