@@ -128,6 +128,7 @@ def tokenize(input_str):
 ```
 
 ### 4.2. For each array, remove duplicates and form a term-frequency vector.
+&emsp; The main part is the ``Counter()`` function, which counts duplicates and merge them together. For example, the query ``["the", "cake", "tastes", "like", "cake"]`` would be merged as ``{"the":1, "cake":2, "tastes":1, "like":1}``.
 
 ```python
 def get_term_freq(movie_item):
