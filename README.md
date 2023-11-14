@@ -45,6 +45,8 @@ score_container = movie.xpath(".//a[@data-track='scores']")score_link = score_c
     if self.custom_settings['SAVE_DATA']:
         __save_data__.save_data_to_excel(data)
 ```
+&emsp; The excel file is ``movie_data.xls``:
+![Image](/screenshots/movie_data.png)
 
 ## 3. Second Crawler ```__get_movie_detail__.py```
 &emsp; Having the url list, we have the second crawler to crawl movie contents of each movie. One movie, with one url, which leads to one movie content, i.e., plots. We wrote a special function to read excel file and form an array of movie urls. These urls are encapsulated into a url array that's ' used as the ``start_urls`` attribute of the second crawler.
@@ -78,7 +80,9 @@ def get_movie_url():
 ```
 ![Image](/screenshots/rotten_tomatoes_detail.png)
 
-&emsp; The following is quite the same. The plot twist is stored in a ``<p>`` element with parameter ``slot="content"``. We retrieve the title & contents of each crawler, and store them into an Excel file. Before storing each plot twist, we remove all the return and tab characters. 
+&emsp; The following is quite the same. The plot twist is stored in a ``<p>`` element with parameter ``slot="content"``. We retrieve the title & contents of each crawler, and store them into an Excel file. Before storing each plot twist, we remove all the return and tab characters. The excel file is named ``movie_content.xls``:
+
+![Image](/screenshots/movie_content.png)
 
 &emsp; Evidently, each movie corresponds to its own plot twists, in other words, articles. These articles will then be used to build a tf-idf search model.
 
