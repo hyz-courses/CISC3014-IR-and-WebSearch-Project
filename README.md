@@ -472,11 +472,4 @@ $$\[\text{{IDF}}(t, D) = \log \left( \frac{{N}}{{\text{{0.5N}} + 1}} \right)\]$$
         idf[idf == min_idf] = 0
 ```
 
-&emsp; The old one's still there, take a look:
-
-## Some Ideas (Temporary):
-&emsp; This project is temporarily given an idea of scraping stock information.
-It would scrape 10 important indecies from Xueqiu.
-
-&emsp; ```get_stock.py``` is the main file.
-
+&emsp; This allows us to prevent any word that's to some extent too common among plot twists from contributing to the search result.
