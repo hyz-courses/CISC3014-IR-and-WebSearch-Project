@@ -193,6 +193,12 @@ def get_top_x_id(similarity_scores, top_x):
     # Fetch top x most relevant.
     # Sort array into descending order. Keep the original index.
     sorted_similarity_scores = np.argsort(similarity_scores)[::-1]
+
+    # Num of records can't exceed maximum
+    num_of_records = len(similarity_scores)
+    if top_x > num_of_records:
+        top_x = num_of_records
+
     top_x_id = sorted_similarity_scores[:top_x]
     return top_x_id
 
