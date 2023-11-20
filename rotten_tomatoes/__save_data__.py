@@ -19,8 +19,6 @@ def save_data_to_excel(data, file_name="movie_data", file_path="./movie_list/"):
         create_new_excel(data, file_location)
 
 
-
-
 def create_new_excel(data, file_location):
     # Create data frame over processed data
     df = pd.DataFrame([data])

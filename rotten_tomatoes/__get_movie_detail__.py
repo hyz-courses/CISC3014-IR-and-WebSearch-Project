@@ -27,7 +27,7 @@ class MovieDetailCrawler(scrapy.Spider):
         # Local settings
         'LANG': 'EN',
         'USE_EXACT_VALUES': True,
-        'SAVE_DATA': True,
+        'SAVE_DATA': False,
         'ROUND_LEVEL': 3,
     }
 
