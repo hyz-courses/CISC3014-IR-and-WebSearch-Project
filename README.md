@@ -20,6 +20,7 @@
 
 ### 3. If you want to play with searching:
 - Please refer to the ``__movie_tfidf__.py`` file!
+- Search is done in the **console widow** of the IDE.
 - Search whatever you want! :)
 - To stop the process, type ``break()``.
 - To list all movies, type ``ls``.
