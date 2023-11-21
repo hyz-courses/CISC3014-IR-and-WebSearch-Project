@@ -19,7 +19,7 @@
 - The ``./movie_list`` directory is where the extracted data stored. Please don't alter any of the files in it.
 
 ### 3. If you want to play with searching:
-- Please refer to the ``__movie_tfidf__.py`` file!
+- Please refer to ``__movie_tfidf__.py``.
 - Search is done in the **console widow** of the IDE.
 - Search whatever you want by typing the query in console! :)
 ```console
@@ -79,15 +79,16 @@ Title: Five Nights at Freddy's
 ```
 
 ### 4. If you want to run the crawler:
-- Please make sure that the ``SAVE_DATA`` trigger in the custom settings in either of the crawler file
+- Please make sure that the ``SAVE_DATA`` trigger in the custom settings in either of the crawler file 
+(``__get_movies__.py`` or ``__get_movie_detail__.py``)
 is set to ``False``. Otherwise, there will be duplicate rows of data since I have already stored some data into the excel file while preparing 
 for the project. It should be pre-set to ``False`` anyways.
 
 
-- If you run the first crawler, please notify that the webpage content might be changed as time passed. The content 
+- If you run the first crawler ``__get_movies__.py``, please notice that the webpage content might be changed as time passed. The content 
 used in the second crawler is based on the data retrieved before Oct. 31, 2023.
 
-#### __get_movies__.py or __get_movie_detail__.py
+#### \_\_get_movies__.py or \_\_get_movie_detail__.py
 ```python
     custom_settings = {
         # Terminal settings: Ignore some warnings and logs
@@ -102,10 +103,10 @@ used in the second crawler is based on the data retrieved before Oct. 31, 2023.
     }
 ```
 
-### 5. If you want to inspect the content of the like the tf-idf matrix:
+### 5. If you want to inspect the content (e.g., the tf-idf matrix):
 &emsp; Please head to ``__settings__.py`` and switch ``CONSOLE_LOG_PROCESS`` to ``True``. This allows the content to be
 print in the console as soon as it is generated.
-#### __settings__.py
+#### \_\_settings\_\_.py
 ```python
 custom_settings = {
     'RM_COMMON_WORDS': True,
