@@ -1,4 +1,4 @@
-# Project Instructions
+# Project Exploration Instructions
 ### Course Name: CISC3014 Information Retrieval and Web Search
 ### Project Title: Plot Search Using TF-IDF Model from Popular list of Rotten Tomatoes
 
@@ -25,9 +25,9 @@
 - To list all movies, type ``ls``.
 
 ### 4. If you want to run the crawler:
-- Please make sure that the ``SAVE_DATA`` trigger in the custom settings in the crawler file
-is set to False. Otherwise, there will be duplicate rows of data since I have already stored some data into the excel file while preparing 
-for the project. It should be pre-set to False anyways.
+- Please make sure that the ``SAVE_DATA`` trigger in the custom settings in either of the crawler file
+is set to ``False``. Otherwise, there will be duplicate rows of data since I have already stored some data into the excel file while preparing 
+for the project. It should be pre-set to ``False`` anyways.
 
 
 - If you run the first crawler, please notify that the webpage content might be changed as time passed. The content 
@@ -49,7 +49,7 @@ used in the second crawler is based on the data retrieved before Oct. 31, 2023.
 ```
 
 ### 5. If you want to inspect the content of the like the tf-idf matrix:
-&emsp; Please head to ``__settings__.py`` and switch ``CONSOLE_LOG_PROCESS`` to True. This allows the content to be
+&emsp; Please head to ``__settings__.py`` and switch ``CONSOLE_LOG_PROCESS`` to ``True``. This allows the content to be
 print in the console as soon as it is generated.
 #### __settings__.py
 ```python
