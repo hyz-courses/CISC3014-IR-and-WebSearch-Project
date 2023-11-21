@@ -1,5 +1,6 @@
 # Project Exploration Instructions
-### Course Name: CISC3014 Information Retrieval and Web Search
+### Course Title: CISC3014 
+### Course Name: Information Retrieval and Web Search
 ### Project Title: Plot Search Using TF-IDF Model from Popular list of Rotten Tomatoes
 
 ### Group Members:
