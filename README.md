@@ -120,4 +120,4 @@ This number can't exceed 117 since there's only 117 movies to be searched. If it
 first 117 records at maximum.
 
 ### 6. If you encounter any problem, please kindly refer to the GitHub repository:
-https://github.com/YanzhenHuang/CISC3014-IR-and-WebSearch-Project/tree/main/rotten_tomatoes
+https://github.com/YanzhenHuang/CISC3014-IR-and-WebSearch-Project
