@@ -8,7 +8,7 @@
 - Chen Zirui, DC127901
 
 ### Report & Presentation file:
-[Report]("Report and Presentation/CISC3014_Project_PDF.pdf")
+[Report](Report%20and%20Presentation/CISC3014_Project_PDF.pdf)
 
 ## Instructions
 **Notice: It is recommended to use PyCharm as the IDE.**
