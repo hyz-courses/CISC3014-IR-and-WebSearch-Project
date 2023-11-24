@@ -14,8 +14,8 @@
 **Notice: It is recommended to use PyCharm as the IDE.**
 ### 1. Please make sure you find the correct file:
 - First Crawler: [``__get_movies__.py``](__get_movies__.py)
-- Second Crawler: ``__get_movie_detail__.py``
-- Build TF-IDF Model and Perform query search: ``__movie_tfidf__.py``
+- Second Crawler: [``__get_movie_detail__.py``](__get_movie_detail__.py)
+- Build TF-IDF Model and Perform query search: [``__movie_tfidf__.py``](__movie_tfidf__.py)
 
 ### 2. The following files are used to assist the project. **Please do not alter!**
 - ``__settings__.py``: This is an integration of settings & dictionaries used in this project.
