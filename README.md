@@ -23,7 +23,7 @@
 - The ``./movie_list`` directory is where the extracted data stored. Please don't alter any of the files in it.
 
 ### 3. If you want to play with searching:
-- Please refer to ``__movie_tfidf__.py``.
+- Please refer to [``__movie_tfidf__.py``](__movie_tfidf__.py).
 - Search is done in the **console widow** of the IDE.
 - Search whatever you want by typing the query in console! :)
 ```console
