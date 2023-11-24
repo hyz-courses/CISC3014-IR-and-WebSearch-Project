@@ -13,7 +13,7 @@
 ## Instructions
 **Notice: It is recommended to use PyCharm as the IDE.**
 ### 1. Please make sure you find the correct file:
-- First Crawler: ``__get_movies__.py``
+- First Crawler: [``__get_movies__.py``](__get_movies__.py)
 - Second Crawler: ``__get_movie_detail__.py``
 - Build TF-IDF Model and Perform query search: ``__movie_tfidf__.py``
 
