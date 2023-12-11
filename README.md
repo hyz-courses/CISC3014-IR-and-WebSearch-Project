@@ -83,7 +83,7 @@ Title: Five Nights at Freddy's
 ```
 
 ### 4. If you want to run the crawler:
-- Please make sure that the ``SAVE_DATA`` trigger in the custom settings in either of the crawler file 
+- Please make sure that the ``SAVE_DATA`` trigger in the custom settings in any of the crawler file 
 (``__get_movies__.py`` or ``__get_movie_detail__.py``)
 is set to ``False``. Otherwise, there will be duplicate rows of data since I have already stored some data into the excel file while preparing 
 for the project. It should be pre-set to ``False`` anyways.
